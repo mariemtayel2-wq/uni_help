@@ -9,5 +9,6 @@ abstract class AppRoute {
   static const String exploreScreen = '/explore-screen';
   static const String notificationsScreen = '/notifications-screen';
   static const String profileScreen = '/profile-screen';
+  static const String forgetScreen = '/forget-screen';
 
 }
