@@ -42,6 +42,8 @@ import 'package:uni_help/features/authentication/presentation/view_model/registe
     as _i50;
 import 'package:uni_help/features/authentication/presentation/view_model/resend_verification_cubit.dart'
     as _i487;
+import 'package:uni_help/features/explore_screen/presentation/view_model/explore_cubit.dart'
+    as _i928;
 import 'package:uni_help/features/home_screen/data/repo/home_data_source_imp.dart'
     as _i685;
 import 'package:uni_help/features/home_screen/data/repo/home_repo_imp.dart'
@@ -123,6 +125,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i749.GetCurrentUserUseCase>(),
         gh<_i66.GetRecentRequestsUseCase>(),
       ),
+    );
+    gh.factory<_i928.ExploreCubit>(
+      () => _i928.ExploreCubit(gh<_i66.GetRecentRequestsUseCase>()),
     );
     return this;
   }
