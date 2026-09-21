@@ -42,6 +42,20 @@ import 'package:uni_help/features/authentication/presentation/view_model/registe
     as _i50;
 import 'package:uni_help/features/authentication/presentation/view_model/resend_verification_cubit.dart'
     as _i487;
+import 'package:uni_help/features/home_screen/data/repo/home_data_source_imp.dart'
+    as _i685;
+import 'package:uni_help/features/home_screen/data/repo/home_repo_imp.dart'
+    as _i780;
+import 'package:uni_help/features/home_screen/domain/repo/home_data_source_repo.dart'
+    as _i412;
+import 'package:uni_help/features/home_screen/domain/repo/home_repo.dart'
+    as _i563;
+import 'package:uni_help/features/home_screen/domain/use_case/get_current_user_use_case.dart'
+    as _i749;
+import 'package:uni_help/features/home_screen/domain/use_case/get_recent_request_use_case.dart'
+    as _i66;
+import 'package:uni_help/features/home_screen/presentation/view_model/home_cubit.dart'
+    as _i221;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -56,6 +70,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i298.AuthRemoteDataSource>(
       () => _i266.AuthRemoteDataSourceImpl(),
+    );
+    gh.lazySingleton<_i412.HomeRemoteDataSource>(
+      () => _i685.HomeRemoteDataSourceImpl(),
     );
     gh.lazySingleton<_i782.AuthRepository>(
       () => _i551.AuthRepositoryImpl(gh<_i298.AuthRemoteDataSource>()),
@@ -75,6 +92,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i462.ResendVerificationEmailUseCase>(
       () => _i462.ResendVerificationEmailUseCase(gh<_i782.AuthRepository>()),
     );
+    gh.lazySingleton<_i563.HomeRepository>(
+      () => _i780.HomeRepositoryImpl(gh<_i412.HomeRemoteDataSource>()),
+    );
     gh.factory<_i25.LoginCubit>(
       () => _i25.LoginCubit(
         gh<_i778.LoginUseCase>(),
@@ -84,6 +104,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i50.RegisterCubit>(
       () => _i50.RegisterCubit(gh<_i470.RegisterUseCase>()),
     );
+    gh.lazySingleton<_i749.GetCurrentUserUseCase>(
+      () => _i749.GetCurrentUserUseCase(gh<_i563.HomeRepository>()),
+    );
+    gh.lazySingleton<_i66.GetRecentRequestsUseCase>(
+      () => _i66.GetRecentRequestsUseCase(gh<_i563.HomeRepository>()),
+    );
     gh.factory<_i487.ResendVerificationCubit>(
       () => _i487.ResendVerificationCubit(
         gh<_i462.ResendVerificationEmailUseCase>(),
@@ -91,6 +117,12 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i718.ForgotPasswordCubit>(
       () => _i718.ForgotPasswordCubit(gh<_i1026.ForgotPasswordUseCase>()),
+    );
+    gh.factory<_i221.HomeCubit>(
+      () => _i221.HomeCubit(
+        gh<_i749.GetCurrentUserUseCase>(),
+        gh<_i66.GetRecentRequestsUseCase>(),
+      ),
     );
     return this;
   }
