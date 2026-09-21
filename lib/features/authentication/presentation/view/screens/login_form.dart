@@ -99,15 +99,7 @@ class _LoginFormState extends State<LoginForm> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Row(
-                  children: [
-                  
-                    Text(
-                      "Remember me",
-                      style: TextStyle(fontSize: 13.sp, color: AppColors.mediumTextColor),
-                    ),
-                  ],
-                ),
+               
                 TextButton(
                   onPressed: () => Navigator.pushNamed(context, AppRoute.forgetScreen),
                   child: Text(
