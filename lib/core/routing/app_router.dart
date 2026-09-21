@@ -28,7 +28,7 @@ class AppRouter {
         return MaterialPageRoute(
           builder: (_) => const ForgotPasswordScreen(),
         );
-       
+        
       default:
         return MaterialPageRoute(
           builder: (_) => const Scaffold(

@@ -10,8 +10,10 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 
+import 'package:cloud_firestore/cloud_firestore.dart' as _i974;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
+import 'package:uni_help/core/services/cloudinary_service.dart' as _i506;
 import 'package:uni_help/core/storage_helper/scure_storage_helper.dart'
     as _i101;
 import 'package:uni_help/features/app_section/view_model/app_section_cubit.dart'
@@ -42,6 +44,18 @@ import 'package:uni_help/features/authentication/presentation/view_model/registe
     as _i50;
 import 'package:uni_help/features/authentication/presentation/view_model/resend_verification_cubit.dart'
     as _i487;
+import 'package:uni_help/features/create_request/data/repo/create_request_data_source_imp.dart'
+    as _i784;
+import 'package:uni_help/features/create_request/data/repo/create_request_repo_imp.dart'
+    as _i1039;
+import 'package:uni_help/features/create_request/domain/repo/request_data_source.dart'
+    as _i700;
+import 'package:uni_help/features/create_request/domain/repo/request_repo.dart'
+    as _i409;
+import 'package:uni_help/features/create_request/domain/use_case/create_request_use_case.dart'
+    as _i183;
+import 'package:uni_help/features/create_request/presentation/view_model/create_request_cubit.dart'
+    as _i720;
 import 'package:uni_help/features/explore_screen/presentation/view_model/explore_cubit.dart'
     as _i928;
 import 'package:uni_help/features/home_screen/data/repo/home_data_source_imp.dart'
@@ -67,14 +81,26 @@ extension GetItInjectableX on _i174.GetIt {
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     gh.factory<_i70.AppSectionCubit>(() => _i70.AppSectionCubit());
+    gh.lazySingleton<_i506.CloudinaryService>(() => _i506.CloudinaryService());
     gh.lazySingleton<_i101.SecureStorageHelper>(
       () => _i101.SecureStorageHelper(),
     );
     gh.lazySingleton<_i298.AuthRemoteDataSource>(
       () => _i266.AuthRemoteDataSourceImpl(),
     );
+    gh.lazySingleton<_i700.CreateRequestRemoteDataSource>(
+      () => _i784.CreateRequestRemoteDataSourceImpl(
+        firestore: gh<_i974.FirebaseFirestore>(),
+        cloudinaryService: gh<_i506.CloudinaryService>(),
+      ),
+    );
     gh.lazySingleton<_i412.HomeRemoteDataSource>(
       () => _i685.HomeRemoteDataSourceImpl(),
+    );
+    gh.factory<_i409.CreateRequestRepository>(
+      () => _i1039.CreateRequestRepositoryImpl(
+        remoteDataSource: gh<_i700.CreateRequestRemoteDataSource>(),
+      ),
     );
     gh.lazySingleton<_i782.AuthRepository>(
       () => _i551.AuthRepositoryImpl(gh<_i298.AuthRemoteDataSource>()),
@@ -97,10 +123,18 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i563.HomeRepository>(
       () => _i780.HomeRepositoryImpl(gh<_i412.HomeRemoteDataSource>()),
     );
+    gh.lazySingleton<_i183.CreateRequestUseCase>(
+      () => _i183.CreateRequestUseCase(gh<_i409.CreateRequestRepository>()),
+    );
     gh.factory<_i25.LoginCubit>(
       () => _i25.LoginCubit(
         gh<_i778.LoginUseCase>(),
         gh<_i378.GoogleSignInUseCase>(),
+      ),
+    );
+    gh.factory<_i720.CreateRequestCubit>(
+      () => _i720.CreateRequestCubit(
+        createRequestUseCase: gh<_i183.CreateRequestUseCase>(),
       ),
     );
     gh.factory<_i50.RegisterCubit>(

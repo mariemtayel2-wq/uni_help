@@ -37,8 +37,55 @@ class RequestModel {
   final String? location;
   final String? availability;
 
+  RequestModel copyWith({
+    String? requesterName,
+    String? requesterInitials,
+    double? requesterRating,
+    int? requesterRatingCount,
+  }) {
+    return RequestModel(
+      id: id,
+      title: title,
+      description: description,
+      category: category,
+      tags: tags,
+      createdAt: createdAt,
+      requesterId: requesterId,
+      requesterName: requesterName ?? this.requesterName,
+      requesterInitials: requesterInitials ?? this.requesterInitials,
+      requesterRating: requesterRating ?? this.requesterRating,
+      requesterRatingCount: requesterRatingCount ?? this.requesterRatingCount,
+      attachments: attachments,
+      preferredTime: preferredTime,
+      location: location,
+      availability: availability,
+    );
+  }
+
   factory RequestModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data() ?? {};
+    final createdAtValue = data['createdAt'];
+    final createdAt = createdAtValue is Timestamp
+        ? createdAtValue.toDate()
+        : createdAtValue is DateTime
+            ? createdAtValue
+            : createdAtValue is String
+                ? DateTime.tryParse(createdAtValue) ?? DateTime.now()
+                : DateTime.now();
+          final attachmentValue = data['attachmentUrl'];
+          final attachmentUrl = attachmentValue is String ? attachmentValue : null;
+          final preferredTimeValue = data['preferredTime'];
+          final preferredTime = preferredTimeValue is Timestamp
+            ? preferredTimeValue.toDate().toIso8601String()
+            : preferredTimeValue is DateTime
+              ? preferredTimeValue.toIso8601String()
+              : preferredTimeValue is String
+                ? preferredTimeValue
+                : null;
+          final ratingCountValue = data['requesterRatingCount'];
+          final requesterRatingCount = ratingCountValue is num
+              ? ratingCountValue.toInt()
+              : int.tryParse(ratingCountValue?.toString() ?? '') ?? 0;
 
     return RequestModel(
       id: doc.id,
@@ -46,16 +93,17 @@ class RequestModel {
       description: data['description'] as String? ?? '',
       category: data['category'] as String? ?? 'General',
       tags: (data['tags'] as List<dynamic>? ?? []).map((t) => t.toString()).toList(),
-      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      requesterId: data['requesterId'] as String? ?? '',
+      createdAt: createdAt,
+      requesterId: data['requesterId'] as String? ?? data['userId'] as String? ?? '',
       requesterName: data['requesterName'] as String? ?? 'Unknown',
       requesterInitials: data['requesterInitials'] as String? ?? '?',
       requesterRating: (data['requesterRating'] as num?)?.toDouble() ?? 0,
-      requesterRatingCount: (data['requesterRatingCount'] as num?)?.toInt() ?? 0,
-      attachments: (data['attachments'] as List<dynamic>? ?? []).map((a) => a.toString()).toList(),
-      preferredTime: data['preferredTime'] as String?,
-      location: data['location'] as String?,
-      availability: data['availability'] as String?,
+      requesterRatingCount: requesterRatingCount,
+        attachments: (data['attachments'] as List<dynamic>?)?.map((a) => a.toString()).toList() ??
+          (attachmentUrl == null ? const [] : [attachmentUrl]),
+      preferredTime: preferredTime,
+      location: data['location']?.toString(),
+      availability: data['availability']?.toString(),
     );
   }
 

@@ -25,9 +25,4 @@ class AppSectionCubit extends Cubit<AppSectionState> {
     emit(AppSectionChanged(currentIndex));
   }
 
-  /// بيتنادي لما المستخدم يدوس على الزرار العايم (+)
-  /// حطيها هنا لو عايزة تفتحي بوتوم شيت أو تعملي Navigator.push لشاشة "Create request" مثلًا
-  void onAddTap() {
-    // Navigator.of(context).pushNamed(AppRoutes.createRequest);
-  }
 }

@@ -1,5 +1,4 @@
 abstract class AppRoute {
-  static const String splash = '/splash';
   static const String onboarding = '/onboarding';
   static const String login = '/login';
   static const String register = '/register';
@@ -10,5 +9,6 @@ abstract class AppRoute {
   static const String notificationsScreen = '/notifications-screen';
   static const String profileScreen = '/profile-screen';
   static const String forgetScreen = '/forget-screen';
+  static const String createRequestScreen = '/create-request-screen';
 
 }
