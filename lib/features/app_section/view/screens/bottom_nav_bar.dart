@@ -1,13 +1,17 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:uni_help/core/constant/app_icons.dart';
+import 'package:uni_help/core/di/service_locator.dart';
 import 'package:uni_help/core/theme/app_colors.dart';
 import 'package:uni_help/core/theme/app_rename.dart';
 import 'package:uni_help/features/app_section/view/widget/nav_icon.dart';
 import 'package:uni_help/features/app_section/view_model/app_section_cubit.dart';
 import 'package:uni_help/features/app_section/view_model/app_section_state.dart';
+import 'package:uni_help/features/create_request/presentation/view/create_request.dart';
+import 'package:uni_help/features/home_screen/presentation/view_model/home_cubit.dart';
 
 class AppSectionScreens extends StatefulWidget {
   const AppSectionScreens({super.key});
@@ -19,6 +23,7 @@ class AppSectionScreens extends StatefulWidget {
 class _AppSectionScreensState extends State<AppSectionScreens> {
   @override
   Widget build(BuildContext context) {
+    
     return BlocProvider(
       create: (_) => AppSectionCubit(),
       child: BlocBuilder<AppSectionCubit, AppSectionState>(
@@ -102,7 +107,6 @@ class _FloatingNavBar extends StatelessWidget {
                         onTap: () => cubit.changeSection(0),
                       ),
                       _NavItem(
-                        // TODO: بدّليها بأيقونة الـ Explore بتاعتك لو مختلفة
                         icon: AppIcons.exploreIcon,
                         label: 'Explore',
                         isSelected: cubit.currentIndex == 1,
@@ -136,7 +140,19 @@ class _FloatingNavBar extends StatelessWidget {
               bottom: 0,
               child: Center(
                 child: GestureDetector(
-                  onTap: cubit.onAddTap,
+                  onTap: () async {
+                    final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CreateRequestScreen(currentUserId: currentUserId),
+                      ),
+                    );
+
+                    if (context.mounted) {
+                      serviceLocator<HomeCubit>().loadHome();
+                                        }
+                  },
                   child: Container(
                     width: _fabSize.w,
                     height: _fabSize.h,
@@ -202,4 +218,5 @@ class _NavItem extends StatelessWidget {
       ),
     );
   }
+  
 }

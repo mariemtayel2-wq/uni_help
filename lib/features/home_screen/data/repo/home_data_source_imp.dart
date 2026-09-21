@@ -17,17 +17,41 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
 
   @override
   Future<List<RequestModel>> getRecentRequests({String? category, int limit = 10}) async {
-    Query<Map<String, dynamic>> query = _firestore
-        .collection(_requestsCollection)
-        .orderBy('createdAt', descending: true)
-        .limit(limit);
+    Query<Map<String, dynamic>> query = _firestore.collection(_requestsCollection);
 
     if (category != null && category != 'All') {
       query = query.where('category', isEqualTo: category);
     }
 
     final snapshot = await query.get();
-    return snapshot.docs.map(RequestModel.fromSnapshot).toList();
+    final parsedRequests = snapshot.docs.map(RequestModel.fromSnapshot).toList();
+    final requests = await Future.wait(parsedRequests.map(_addRequesterData))
+      ..sort((first, second) => second.createdAt.compareTo(first.createdAt));
+
+    return requests.take(limit).toList();
+  }
+
+  Future<RequestModel> _addRequesterData(RequestModel request) async {
+    if (request.requesterId.isEmpty || request.requesterName != 'Unknown') {
+      return request;
+    }
+
+    final userSnapshot = await _firestore.collection(_usersCollection).doc(request.requesterId).get();
+    final data = userSnapshot.data() ?? const <String, dynamic>{};
+    final fullName = (data['fullName'] as String?)?.trim();
+
+    if (fullName == null || fullName.isEmpty) {
+      return request;
+    }
+
+    final parts = fullName.split(RegExp(r'\s+'));
+    final initials = parts.take(2).map((part) => part[0].toUpperCase()).join();
+    return request.copyWith(
+      requesterName: fullName,
+      requesterInitials: initials.isEmpty ? '?' : initials,
+      requesterRating: (data['rating'] as num?)?.toDouble() ?? request.requesterRating,
+      requesterRatingCount: (data['ratingCount'] as num?)?.toInt() ?? request.requesterRatingCount,
+    );
   }
 
   @override
