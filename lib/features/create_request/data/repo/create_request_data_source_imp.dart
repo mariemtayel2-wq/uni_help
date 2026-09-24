@@ -56,11 +56,44 @@ class CreateRequestRemoteDataSourceImpl
       requestData['requesterRating'] = (userData['rating'] as num?)?.toDouble() ?? 0;
       requestData['requesterRatingCount'] = (userData['ratingCount'] as num?)?.toInt() ?? 0;
 
+      // ============================================================
+      // من هنا لتحت: توفيق أسماء/أشكال الحقول مع اللي Home وExplore
+      // وfirestore.rules بيتوقعوها. من غير الجزء ده، الطلب هيترفض
+      // إنشاءه من الأساس (rules بتتأكد من requesterId مش userId)،
+      // ولو افترضنا اتعدلت الـ rules، الطلب هيظهر في Home بلا تاجات
+      // ولا مرفقات ولا وقت مفضّل.
+      // ============================================================
+
+      // requesterId مش userId
+      requestData['requesterId'] = user?.uid ?? '';
+      requestData.remove('userId');
+
+      // tags (List) بدل skillNeeded (String) بس — الأصل لسه موجود لو
+      // حبيتي تستخدميه في مكان تاني.
+      final skill = requestData['skillNeeded'] as String?;
+      requestData['tags'] = (skill == null || skill.isEmpty) ? <String>[] : [skill];
+
+      // attachments (List) بدل attachmentUrl (String) بس
+      requestData['attachments'] = attachmentUrl != null ? [attachmentUrl] : <String>[];
+
+      // preferredTime كـ String مقروء، مش Timestamp — Home بتتوقعه نص
+      final preferredTimeValue = requestData['preferredTime'];
+      if (preferredTimeValue is Timestamp) {
+        requestData['preferredTime'] = _formatPreferredTime(preferredTimeValue.toDate());
+      }
+
       await firestore.collection('requests').add(
         requestData,
       );
     } catch (e) {
       throw Exception('Failed to create request: $e');
     }
+  }
+
+  String _formatPreferredTime(DateTime dateTime) {
+    final hour = dateTime.hour % 12 == 0 ? 12 : dateTime.hour % 12;
+    final period = dateTime.hour >= 12 ? 'PM' : 'AM';
+    final minute = dateTime.minute.toString().padLeft(2, '0');
+    return '${dateTime.day}/${dateTime.month}, $hour:$minute $period';
   }
 }

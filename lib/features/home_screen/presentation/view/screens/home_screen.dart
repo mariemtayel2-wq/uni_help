@@ -6,10 +6,12 @@ import 'package:uni_help/core/constant/request_category.dart';
 import 'package:uni_help/core/di/service_locator.dart';
 import 'package:uni_help/core/theme/app_colors.dart';
 import 'package:uni_help/features/app_section/view_model/app_section_cubit.dart';
+import 'package:uni_help/features/app_section/view_model/app_section_state.dart';
 import 'package:uni_help/features/home_screen/presentation/view/screens/request_card.dart';
 import 'package:uni_help/features/home_screen/presentation/view/utils/home_shimmer.dart';
 import 'package:uni_help/features/home_screen/presentation/view_model/home_cubit.dart';
 import 'package:uni_help/features/home_screen/presentation/view_model/home_state_cubit.dart';
+import 'package:uni_help/features/request_detail_screen/request_details_screen.dart';
 
 const _categories = requestCategories;
 
@@ -32,10 +34,16 @@ class _HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      body: SafeArea(
-        bottom: false,
-        child: BlocBuilder<HomeCubit, HomeState>(
-          builder: (context, state) {
+      body: BlocListener<AppSectionCubit, AppSectionState>(
+        listener: (context, state) {
+          if (state is AppSectionChanged && state.currentIndex == 0) {
+            context.read<HomeCubit>().refresh();
+          }
+        },
+        child: SafeArea(
+          bottom: false,
+          child: BlocBuilder<HomeCubit, HomeState>(
+            builder: (context, state) {
             if (state is HomeLoading || state is HomeInitial) {
               return const HomeScreenShimmer();
             }
@@ -105,16 +113,17 @@ class _HomeView extends StatelessWidget {
                     ...loaded.requests.map(
                       (r) => RequestCard(
                         request: r,
-                        // onTap: () => Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(builder: (_) => RequestDetailsScreen(request: r)),
-                        // ),
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => RequestDetailsScreen(request: r)),
+                        ),
                       ),
                     ),
                 ],
               ),
             );
-          },
+            },
+          ),
         ),
       ),
     );

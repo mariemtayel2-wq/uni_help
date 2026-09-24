@@ -4,14 +4,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:uni_help/core/constant/app_icons.dart';
-import 'package:uni_help/core/di/service_locator.dart';
 import 'package:uni_help/core/theme/app_colors.dart';
 import 'package:uni_help/core/theme/app_rename.dart';
 import 'package:uni_help/features/app_section/view/widget/nav_icon.dart';
 import 'package:uni_help/features/app_section/view_model/app_section_cubit.dart';
 import 'package:uni_help/features/app_section/view_model/app_section_state.dart';
 import 'package:uni_help/features/create_request/presentation/view/create_request.dart';
-import 'package:uni_help/features/home_screen/presentation/view_model/home_cubit.dart';
 
 class AppSectionScreens extends StatefulWidget {
   const AppSectionScreens({super.key});
@@ -150,8 +148,8 @@ class _FloatingNavBar extends StatelessWidget {
                     );
 
                     if (context.mounted) {
-                      serviceLocator<HomeCubit>().loadHome();
-                                        }
+                      context.read<AppSectionCubit>().changeSection(0);
+                    }
                   },
                   child: Container(
                     width: _fabSize.w,
