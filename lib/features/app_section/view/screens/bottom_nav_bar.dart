@@ -4,12 +4,15 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:uni_help/core/constant/app_icons.dart';
+import 'package:uni_help/core/di/service_locator.dart';
 import 'package:uni_help/core/theme/app_colors.dart';
 import 'package:uni_help/core/theme/app_rename.dart';
 import 'package:uni_help/features/app_section/view/widget/nav_icon.dart';
 import 'package:uni_help/features/app_section/view_model/app_section_cubit.dart';
 import 'package:uni_help/features/app_section/view_model/app_section_state.dart';
 import 'package:uni_help/features/create_request/presentation/view/create_request.dart';
+import 'package:uni_help/features/notification_screen/presentation/view_model/notification_cubit.dart';
+import 'package:uni_help/features/notification_screen/presentation/view_model/notification_state_cubit.dart';
 
 class AppSectionScreens extends StatefulWidget {
   const AppSectionScreens({super.key});
@@ -21,9 +24,15 @@ class AppSectionScreens extends StatefulWidget {
 class _AppSectionScreensState extends State<AppSectionScreens> {
   @override
   Widget build(BuildContext context) {
-    
-    return BlocProvider(
-      create: (_) => AppSectionCubit(),
+    final uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => AppSectionCubit()),
+        // ⬅️ الإضافة الجديدة: الـ Cubit ده بيتعمله listen مرة واحدة هنا
+        // وبيفضل عايش طول ما اليوزر جوه التطبيق، مش مربوط بشاشة الإشعارات نفسها
+        BlocProvider(create: (_) => serviceLocator<NotificationsCubit>()..listen(uid)),
+      ],
       child: BlocBuilder<AppSectionCubit, AppSectionState>(
         builder: (context, state) {
           final cubit = context.read<AppSectionCubit>();
@@ -70,7 +79,6 @@ class _FloatingNavBar extends StatelessWidget {
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            // الشريط البيضاوي (Pill) في الأسفل
             Positioned(
               left: 0,
               right: 0,
@@ -110,11 +118,9 @@ class _FloatingNavBar extends StatelessWidget {
                         isSelected: cubit.currentIndex == 1,
                         onTap: () => cubit.changeSection(1),
                       ),
-                      // مساحة فاضية عشان الزرار العايم يقعد فوقيها
                       SizedBox(width: _fabSize.w),
-                      _NavItem(
-                        icon: AppIcons.rewardsIcon,
-                        label: 'Alerts',
+                      // ⬅️ بدّلنا _NavItem العادي بـ widget جديد بيعرض badge
+                      _AlertsNavItem(
                         isSelected: cubit.currentIndex == 2,
                         onTap: () => cubit.changeSection(2),
                       ),
@@ -129,8 +135,6 @@ class _FloatingNavBar extends StatelessWidget {
                 ),
               ),
             ),
-
-            // الزرار العايم (+) فوق الشريط
             Positioned(
               top: 0,
               left: 0,
@@ -206,9 +210,7 @@ class _NavItem extends StatelessWidget {
             Text(
               label,
               style: AppTextStyles.medium12Px.copyWith(
-                color: isSelected
-                    ? AppColors.primaryColor
-                    : AppColors.mediumTextColor,
+                color: isSelected ? AppColors.primaryColor : AppColors.mediumTextColor,
               ),
             ),
           ],
@@ -216,5 +218,47 @@ class _NavItem extends StatelessWidget {
       ),
     );
   }
-  
+}
+
+// ⬅️ Widget جديد مخصوص لـ Alerts، بيعرض badge بعدد الإشعارات غير المقروءة
+class _AlertsNavItem extends StatelessWidget {
+  const _AlertsNavItem({required this.isSelected, required this.onTap});
+
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      customBorder: const CircleBorder(),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 6.h),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            BlocBuilder<NotificationsCubit, NotificationsStateCubit>(
+              builder: (context, state) {
+                final unreadCount =
+                    state is NotificationsStateLoaded ? state.unreadCount : 0;
+                return Badge(
+                  label: Text('$unreadCount'),
+                  isLabelVisible: unreadCount > 0,
+                  child: navIcon(path: AppIcons.rewardsIcon, isSelected: isSelected),
+                );
+              },
+            ),
+            SizedBox(height: 4.h),
+            Text(
+              'Alerts',
+              style: AppTextStyles.medium12Px.copyWith(
+                color: isSelected ? AppColors.primaryColor : AppColors.mediumTextColor,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

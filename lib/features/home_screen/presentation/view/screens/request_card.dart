@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:uni_help/core/entities/request_entity.dart';
 
 import 'package:uni_help/core/theme/app_colors.dart';
 import 'package:uni_help/core/utils/time_ago.dart';
-import 'package:uni_help/features/home_screen/domain/entity/request_entity.dart';
 
 class RequestCard extends StatelessWidget {
   const RequestCard({required this.request, this.onTap, this.onMoreTap, super.key});

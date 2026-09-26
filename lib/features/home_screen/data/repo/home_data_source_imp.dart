@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:injectable/injectable.dart';
+import 'package:uni_help/core/model/current_user_dto.dart';
+import 'package:uni_help/core/model/request_dto.dart';
 
-import 'package:uni_help/features/home_screen/data/model/current_user_model.dart';
-import 'package:uni_help/features/home_screen/data/model/request_dto.dart';
 import 'package:uni_help/features/home_screen/domain/repo/home_data_source_repo.dart';
 
 

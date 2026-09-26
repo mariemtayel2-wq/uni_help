@@ -1,7 +1,8 @@
 import 'dart:io';
 
-import 'package:uni_help/features/create_request/data/model/create_request_dto.dart';
+import 'package:uni_help/core/model/request_dto.dart';
+
 
 abstract class CreateRequestRemoteDataSource {
-  Future<void> createRequest(CreateRequestModel requestModel, File? attachment);
+  Future<void> createRequest(RequestModel requestModel, File? attachment);
 }

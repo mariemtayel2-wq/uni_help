@@ -19,8 +19,10 @@ class HomeCubit extends Cubit<HomeState> {
       final currentUser = await _getCurrentUserUseCase();
       final requests = await _getRecentRequestsUseCase(category: 'All');
 
+      if (isClosed) return;
       emit(HomeLoaded(currentUser: currentUser, requests: requests, selectedCategory: 'All'));
     } catch (e) {
+      if (isClosed) return;
       emit(HomeError(e.toString().replaceFirst('Exception: ', '')));
     }
   }
@@ -31,8 +33,10 @@ class HomeCubit extends Cubit<HomeState> {
 
     try {
       final requests = await _getRecentRequestsUseCase(category: category);
+      if (isClosed) return;
       emit(current.copyWith(requests: requests, selectedCategory: category));
     } catch (e) {
+      if (isClosed) return;
       emit(HomeError(e.toString().replaceFirst('Exception: ', '')));
     }
   }
