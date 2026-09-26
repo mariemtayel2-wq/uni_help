@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:uni_help/core/entities/request_entity.dart';
 import 'package:uni_help/core/theme/app_colors.dart';
-import 'package:uni_help/features/home_screen/domain/entity/request_entity.dart';
 import 'package:url_launcher/url_launcher.dart'; // لتشغيل فتح روابط الملفات خارجياً
-
+import 'package:intl/intl.dart';
 class RequestDetailsScreen extends StatelessWidget {
-  const RequestDetailsScreen({required this.request, super.key});
+  const RequestDetailsScreen({required this.request, super.key, requestId});
 
   final RequestEntity request;
 
@@ -219,8 +219,13 @@ bool _isImage(String url) {
                     ),
                     SizedBox(height: 10.h),
                     if (request.preferredTime != null)
-                      _InfoRow(icon: Icons.access_time_rounded, label: 'Preferred Time', value: request.preferredTime!),
-                    if (request.location != null)
+_InfoRow(
+  icon: Icons.access_time_rounded,
+  label: 'Preferred Time',
+  value: request.preferredTime != null
+      ? DateFormat('d MMM, h:mm a').format(request.preferredTime!)
+      : 'Not specified',
+),                    if (request.location != null)
                       _InfoRow(icon: Icons.location_on_outlined, label: 'Location', value: request.location!),
                     if (request.availability != null)
                       _InfoRow(icon: Icons.check_circle_outline, label: 'Availability', value: request.availability!),

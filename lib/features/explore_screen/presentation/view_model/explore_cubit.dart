@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:uni_help/core/entities/request_entity.dart';
 
-import 'package:uni_help/features/home_screen/domain/entity/request_entity.dart';
 import 'package:uni_help/features/explore_screen/presentation/view_model/explore_state.dart';
 import 'package:uni_help/features/home_screen/domain/use_case/get_recent_request_use_case.dart';
 

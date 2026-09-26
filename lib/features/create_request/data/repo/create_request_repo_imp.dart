@@ -1,10 +1,10 @@
 import 'dart:io';
 
-import 'package:uni_help/features/create_request/data/model/create_request_dto.dart';
-import 'package:uni_help/features/create_request/domain/entity/request_entity.dart';
+import 'package:injectable/injectable.dart';
+import 'package:uni_help/core/entities/request_entity.dart';
+import 'package:uni_help/core/model/request_dto.dart';
 import 'package:uni_help/features/create_request/domain/repo/request_data_source.dart';
 import 'package:uni_help/features/create_request/domain/repo/request_repo.dart';
-import 'package:injectable/injectable.dart';
 
 @Injectable(as: CreateRequestRepository)
 class CreateRequestRepositoryImpl implements CreateRequestRepository {
@@ -20,7 +20,9 @@ class CreateRequestRepositoryImpl implements CreateRequestRepository {
     File? attachment,
   ) async {
     try {
-      final requestModel = CreateRequestModel.fromEntity(request);
+      final requestModel = RequestModel.fromEntity(
+        request,
+      );
 
       await remoteDataSource.createRequest(
         requestModel,
@@ -30,4 +32,6 @@ class CreateRequestRepositoryImpl implements CreateRequestRepository {
       throw Exception('Failed to create request: $e');
     }
   }
+
+
 }

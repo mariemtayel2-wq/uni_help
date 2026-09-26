@@ -1,9 +1,13 @@
+// ignore_for_file: unused_local_variable
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uni_help/core/constant/request_category.dart';
 
 import 'package:uni_help/core/di/service_locator.dart';
+import 'package:uni_help/core/services/notification_permision.dart';
 import 'package:uni_help/core/theme/app_colors.dart';
 import 'package:uni_help/features/app_section/view_model/app_section_cubit.dart';
 import 'package:uni_help/features/app_section/view_model/app_section_state.dart';
@@ -15,9 +19,14 @@ import 'package:uni_help/features/request_detail_screen/request_details_screen.d
 
 const _categories = requestCategories;
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -25,11 +34,28 @@ class HomeScreen extends StatelessWidget {
       child: const _HomeView(),
     );
   }
-}
 
+    @override
+  void initState() {
+    super.initState();
+    _checkNotificationPermission();
+  }
+}
+Future<void> _checkNotificationPermission() async {
+  final prefs = await SharedPreferences.getInstance();
+
+  final alreadyAsked =
+      prefs.getBool('asked_notification_permission') ?? false;
+
+  if (!alreadyAsked) {
+    await _askForNotificationPermission();
+    await prefs.setBool('asked_notification_permission', true);
+  }
+}
+Future<void> _askForNotificationPermission() async {
+  final granted = await serviceLocator<NotificationPermissionService>().requestSystemPermission();}
 class _HomeView extends StatelessWidget {
   const _HomeView();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

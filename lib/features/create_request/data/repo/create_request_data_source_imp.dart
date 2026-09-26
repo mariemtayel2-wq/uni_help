@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:injectable/injectable.dart';
+import 'package:uni_help/core/model/request_dto.dart';
 import 'package:uni_help/core/services/cloudinary_service.dart';
-import 'package:uni_help/features/create_request/data/model/create_request_dto.dart';
 import 'package:uni_help/features/create_request/domain/repo/request_data_source.dart';
 
 @LazySingleton(as: CreateRequestRemoteDataSource)
@@ -20,7 +20,7 @@ class CreateRequestRemoteDataSourceImpl
 
   @override
   Future<void> createRequest(
-    CreateRequestModel requestModel,
+    RequestModel requestModel,
     File? attachment,
   ) async {
     try {
@@ -32,9 +32,8 @@ class CreateRequestRemoteDataSourceImpl
         );
       }
 
-      final finalModel = CreateRequestModel.fromEntity(
+      final finalModel = RequestModel.fromEntity(
         requestModel.toEntity(),
-        attachmentUrl: attachmentUrl,
       );
 
       final user = FirebaseAuth.instance.currentUser;
@@ -50,7 +49,7 @@ class CreateRequestRemoteDataSourceImpl
           ? '?'
           : nameParts.take(2).map((part) => part[0].toUpperCase()).join();
 
-      final requestData = finalModel.toJson();
+      final requestData = finalModel.toMap();
       requestData['requesterName'] = requesterName?.isNotEmpty == true ? requesterName : 'Unknown';
       requestData['requesterInitials'] = requesterInitials;
       requestData['requesterRating'] = (userData['rating'] as num?)?.toDouble() ?? 0;
@@ -96,4 +95,22 @@ class CreateRequestRemoteDataSourceImpl
     final minute = dateTime.minute.toString().padLeft(2, '0');
     return '${dateTime.day}/${dateTime.month}, $hour:$minute $period';
   }
+
+// Future<CreateRequestModel> getRequestById(String requestId) async {
+//   try {
+//     final doc = await firestore.collection('requests').doc(requestId).get();
+
+//     if (!doc.exists || doc.data() == null) {
+//       throw Exception('Request not found');
+//     }
+
+//     // إرسال الـ Map كأول Parameter والـ docId كـ Named Parameter
+//     return CreateRequestModel.fromMap(
+//       doc.data()!,
+//       docId: doc.id,
+//     );
+//   } catch (e) {
+//     throw Exception('Failed to fetch request details: ${e.toString()}');
+//   }
+// }
 }

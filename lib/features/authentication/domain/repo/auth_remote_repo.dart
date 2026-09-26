@@ -8,6 +8,6 @@ abstract class AuthRepository {
   Future<void> register(RegisterEntity entity);
 
   Future<void> forgotPassword(ForgotPasswordEntity entity);
-   Future<void> resendVerificationEmail();
+    Future<void> resendVerificationEmail();
     Future<void>signInWithGoogle() ;
 }

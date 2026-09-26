@@ -1,7 +1,7 @@
 import 'package:injectable/injectable.dart';
+import 'package:uni_help/core/entities/current_user_entity.dart';
+import 'package:uni_help/core/entities/request_entity.dart';
 
-import 'package:uni_help/features/home_screen/domain/entity/current_user_entity.dart';
-import 'package:uni_help/features/home_screen/domain/entity/request_entity.dart';
 import 'package:uni_help/features/home_screen/domain/repo/home_data_source_repo.dart';
 import 'package:uni_help/features/home_screen/domain/repo/home_repo.dart';
 

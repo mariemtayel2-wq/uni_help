@@ -1,4 +1,4 @@
-import 'package:uni_help/features/home_screen/domain/entity/request_entity.dart';
+import 'package:uni_help/core/entities/request_entity.dart';
 
 abstract class ExploreState {
   const ExploreState();

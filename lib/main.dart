@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:uni_help/core/di/service_locator.dart';
 import 'package:uni_help/core/routing/app_router.dart';
+import 'package:uni_help/core/services/local_notification.dart';
 import 'package:uni_help/core/storage_helper/local_storage.dart';
 import 'package:uni_help/features/app_section/view/screens/bottom_nav_bar.dart';
 import 'package:uni_help/features/authentication/presentation/view/screens/auth_screen.dart';
@@ -12,15 +13,11 @@ import 'package:uni_help/firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // تهيئة الفايربيز الأساسية فقط
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  
   configureDependencies();
-
-  // جلب قيمة المرة الأولى بشكل سريع
+    await serviceLocator<LocalNotificationService>().init();
   bool isFirstTime = await LocalStorage.isFirstTime();
 
   runApp(MyApp(isFirstTime: isFirstTime));
@@ -28,12 +25,7 @@ void main() async {
 class MyApp extends StatelessWidget {
 
   const MyApp({super.key, required this.isFirstTime});
-
-
-
   final bool isFirstTime;
-
-
 
   @override
 
@@ -57,9 +49,8 @@ class MyApp extends StatelessWidget {
                       );
                     }
                     if (snapshot.hasData && snapshot.data != null) {
-                      return  AppSectionScreens(); // الصفحة الرئيسية
-                    }
-                    return const AuthScreen(); // صفحة اللوج إن
+                      return  AppSectionScreens(); }
+                    return const AuthScreen(); // صفحة  إن
                   },
                 ),
         );

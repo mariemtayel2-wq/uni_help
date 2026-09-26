@@ -11,9 +11,17 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 
 import 'package:cloud_firestore/cloud_firestore.dart' as _i974;
+import 'package:firebase_auth/firebase_auth.dart' as _i59;
+import 'package:flutter_local_notifications/flutter_local_notifications.dart'
+    as _i163;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
+import 'package:uni_help/core/reposatries/user_directory_repo.dart' as _i339;
+import 'package:uni_help/core/reposatries/user_directory_repo_imp.dart'
+    as _i104;
 import 'package:uni_help/core/services/cloudinary_service.dart' as _i506;
+import 'package:uni_help/core/services/local_notification.dart' as _i187;
+import 'package:uni_help/core/services/notification_permision.dart' as _i44;
 import 'package:uni_help/core/storage_helper/scure_storage_helper.dart'
     as _i101;
 import 'package:uni_help/features/app_section/view_model/app_section_cubit.dart'
@@ -54,6 +62,8 @@ import 'package:uni_help/features/create_request/domain/repo/request_repo.dart'
     as _i409;
 import 'package:uni_help/features/create_request/domain/use_case/create_request_use_case.dart'
     as _i183;
+import 'package:uni_help/features/create_request/domain/use_case/notify_helpers_about_new_request_use_case.dart'
+    as _i489;
 import 'package:uni_help/features/create_request/presentation/view_model/create_request_cubit.dart'
     as _i720;
 import 'package:uni_help/features/explore_screen/presentation/view_model/explore_cubit.dart'
@@ -72,6 +82,24 @@ import 'package:uni_help/features/home_screen/domain/use_case/get_recent_request
     as _i66;
 import 'package:uni_help/features/home_screen/presentation/view_model/home_cubit.dart'
     as _i221;
+import 'package:uni_help/features/notification_screen/data/repo/notification_data_source_imp.dart'
+    as _i906;
+import 'package:uni_help/features/notification_screen/data/repo/notification_repo_imp.dart'
+    as _i934;
+import 'package:uni_help/features/notification_screen/domain/repo/notification_data_source.dart'
+    as _i549;
+import 'package:uni_help/features/notification_screen/domain/repo/notification_repo.dart'
+    as _i237;
+import 'package:uni_help/features/notification_screen/domain/use_case/make_all_as_read_use_case.dart'
+    as _i752;
+import 'package:uni_help/features/notification_screen/domain/use_case/mark_as_read_use_case.dart'
+    as _i1002;
+import 'package:uni_help/features/notification_screen/domain/use_case/send_notification_use_case.dart'
+    as _i142;
+import 'package:uni_help/features/notification_screen/domain/use_case/watch_notifications.dart'
+    as _i1034;
+import 'package:uni_help/features/notification_screen/presentation/view_model/notification_cubit.dart'
+    as _i397;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -120,6 +148,16 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i462.ResendVerificationEmailUseCase>(
       () => _i462.ResendVerificationEmailUseCase(gh<_i782.AuthRepository>()),
     );
+    gh.lazySingleton<_i549.NotificationsRemoteDataSource>(
+      () => _i906.NotificationsRemoteDataSourceImpl(
+        gh<_i974.FirebaseFirestore>(),
+      ),
+    );
+    gh.lazySingleton<_i187.LocalNotificationService>(
+      () => _i187.LocalNotificationService(
+        gh<_i163.FlutterLocalNotificationsPlugin>(),
+      ),
+    );
     gh.lazySingleton<_i563.HomeRepository>(
       () => _i780.HomeRepositoryImpl(gh<_i412.HomeRemoteDataSource>()),
     );
@@ -132,13 +170,23 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i378.GoogleSignInUseCase>(),
       ),
     );
-    gh.factory<_i720.CreateRequestCubit>(
-      () => _i720.CreateRequestCubit(
-        createRequestUseCase: gh<_i183.CreateRequestUseCase>(),
+    gh.lazySingleton<_i44.NotificationPermissionService>(
+      () => _i44.NotificationPermissionService(
+        gh<_i163.FlutterLocalNotificationsPlugin>(),
+        gh<_i974.FirebaseFirestore>(),
+        gh<_i59.FirebaseAuth>(),
       ),
+    );
+    gh.lazySingleton<_i339.UsersDirectoryRepository>(
+      () => _i104.UsersDirectoryRepositoryImpl(gh<_i974.FirebaseFirestore>()),
     );
     gh.factory<_i50.RegisterCubit>(
       () => _i50.RegisterCubit(gh<_i470.RegisterUseCase>()),
+    );
+    gh.lazySingleton<_i237.NotificationsRepository>(
+      () => _i934.NotificationsRepositoryImpl(
+        gh<_i549.NotificationsRemoteDataSource>(),
+      ),
     );
     gh.lazySingleton<_i749.GetCurrentUserUseCase>(
       () => _i749.GetCurrentUserUseCase(gh<_i563.HomeRepository>()),
@@ -160,8 +208,47 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i66.GetRecentRequestsUseCase>(),
       ),
     );
+    gh.lazySingleton<_i752.MarkAllNotificationsReadUseCase>(
+      () => _i752.MarkAllNotificationsReadUseCase(
+        gh<_i237.NotificationsRepository>(),
+      ),
+    );
+    gh.lazySingleton<_i1002.MarkNotificationReadUseCase>(
+      () => _i1002.MarkNotificationReadUseCase(
+        gh<_i237.NotificationsRepository>(),
+      ),
+    );
+    gh.lazySingleton<_i142.SendNotificationUseCase>(
+      () => _i142.SendNotificationUseCase(gh<_i237.NotificationsRepository>()),
+    );
+    gh.lazySingleton<_i1034.WatchNotificationsUseCase>(
+      () =>
+          _i1034.WatchNotificationsUseCase(gh<_i237.NotificationsRepository>()),
+    );
     gh.factory<_i928.ExploreCubit>(
       () => _i928.ExploreCubit(gh<_i66.GetRecentRequestsUseCase>()),
+    );
+    gh.factory<_i397.NotificationsCubit>(
+      () => _i397.NotificationsCubit(
+        watchNotificationsUseCase: gh<_i1034.WatchNotificationsUseCase>(),
+        markAsReadUseCase: gh<_i1002.MarkNotificationReadUseCase>(),
+        markAllAsReadUseCase: gh<_i752.MarkAllNotificationsReadUseCase>(),
+        localNotificationService: gh<_i187.LocalNotificationService>(),
+        permissionService: gh<_i44.NotificationPermissionService>(),
+      ),
+    );
+    gh.lazySingleton<_i489.NotifyHelpersAboutNewRequestUseCase>(
+      () => _i489.NotifyHelpersAboutNewRequestUseCase(
+        gh<_i339.UsersDirectoryRepository>(),
+        gh<_i142.SendNotificationUseCase>(),
+      ),
+    );
+    gh.factory<_i720.CreateRequestCubit>(
+      () => _i720.CreateRequestCubit(
+        createRequestUseCase: gh<_i183.CreateRequestUseCase>(),
+        getCurrentUserUseCase: gh<_i749.GetCurrentUserUseCase>(),
+        notifyHelpersUseCase: gh<_i489.NotifyHelpersAboutNewRequestUseCase>(),
+      ),
     );
     return this;
   }
