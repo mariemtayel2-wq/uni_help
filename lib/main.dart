@@ -50,7 +50,7 @@ class MyApp extends StatelessWidget {
                     }
                     if (snapshot.hasData && snapshot.data != null) {
                       return  AppSectionScreens(); }
-                    return const AuthScreen(); // صفحة  إن
+                    return const AuthScreen(); 
                   },
                 ),
         );
