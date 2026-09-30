@@ -1,3 +1,5 @@
+enum RequestStatus { pending, inProgress, completed, cancelled }
+
 class RequestEntity {
   const RequestEntity({
     this.id,
@@ -16,6 +18,9 @@ class RequestEntity {
     this.preferredTime,
     this.location,
     this.availability,
+    this.status = RequestStatus.pending,
+    this.helperId,
+    this.helperName,
   });
 
   final String? id;
@@ -37,12 +42,19 @@ class RequestEntity {
   final String? location;
   final String? availability;
 
+  final RequestStatus status;
+  final String? helperId;
+  final String? helperName;
+
   RequestEntity copyWith({
     String? id,
     String? requesterName,
     String? requesterInitials,
     double? requesterRating,
     int? requesterRatingCount,
+    RequestStatus? status,
+    String? helperId,
+    String? helperName,
   }) {
     return RequestEntity(
       id: id ?? this.id,
@@ -55,6 +67,9 @@ class RequestEntity {
       requesterRatingCount: requesterRatingCount ?? this.requesterRatingCount,
       attachments: attachments, preferredTime: preferredTime,
       location: location, availability: availability,
+      status: status ?? this.status,
+      helperId: helperId ?? this.helperId,
+      helperName: helperName ?? this.helperName,
     );
   }
 }

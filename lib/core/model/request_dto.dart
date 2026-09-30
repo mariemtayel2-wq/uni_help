@@ -19,6 +19,9 @@ class RequestModel {
     this.preferredTime,
     this.location,
     this.availability,
+    this.status = RequestStatus.pending,
+    this.helperId,
+    this.helperName,
   });
 
   final String? id;
@@ -37,6 +40,9 @@ class RequestModel {
   final DateTime? preferredTime;
   final String? location;
   final String? availability;
+  final RequestStatus status;
+  final String? helperId;
+  final String? helperName;
 
   // ---------- القراءة ----------
 
@@ -44,7 +50,6 @@ class RequestModel {
     return RequestModel.fromMap(doc.id, doc.data() as Map<String, dynamic>? ?? {});
   }
 
-  // alias عشان أي كود قديم بينادي fromSnapshot يفضل شغال
   factory RequestModel.fromSnapshot(DocumentSnapshot doc) => RequestModel.fromFirestore(doc);
 
   factory RequestModel.fromMap(String id, Map<String, dynamic> data) {
@@ -71,12 +76,17 @@ class RequestModel {
         ? ratingCountValue.toInt()
         : int.tryParse(ratingCountValue?.toString() ?? '') ?? 0;
 
-    // ⬇️ توافق مع الداتا القديمة: documents اتكتبت زمان بـ attachmentUrl مفرد
-    // أو documents جديدة بـ attachments List - الاتنين هيتقروا صح
     final attachmentsList = (data['attachments'] as List<dynamic>?)
             ?.map((a) => a.toString())
             .toList() ??
         (data['attachmentUrl'] is String ? [data['attachmentUrl'] as String] : const <String>[]);
+
+    // ⬅️ جديد: لو الطلب قديم ومفيهوش status، نعتبره pending تلقائيًا
+    final statusValue = data['status'] as String?;
+    final status = RequestStatus.values.firstWhere(
+      (s) => s.name == statusValue,
+      orElse: () => RequestStatus.pending,
+    );
 
     return RequestModel(
       id: id,
@@ -86,7 +96,6 @@ class RequestModel {
       skillNeeded: data['skillNeeded'] as String? ?? '',
       tags: (data['tags'] as List<dynamic>? ?? []).map((t) => t.toString()).toList(),
       createdAt: createdAt,
-      // ⬇️ توافق مع الداتا القديمة: documents زمان اتكتبت بـ userId مش requesterId
       requesterId: data['requesterId'] as String? ?? data['userId'] as String? ?? '',
       requesterName: data['requesterName'] as String? ?? 'Unknown',
       requesterInitials: data['requesterInitials'] as String? ?? '?',
@@ -96,6 +105,9 @@ class RequestModel {
       preferredTime: preferredTime,
       location: data['location']?.toString(),
       availability: data['availability']?.toString(),
+      status: status,
+      helperId: data['helperId'] as String?,
+      helperName: data['helperName'] as String?,
     );
   }
 
@@ -118,10 +130,12 @@ class RequestModel {
       'preferredTime': preferredTime != null ? Timestamp.fromDate(preferredTime!) : null,
       'location': location,
       'availability': availability,
+      'status': status.name,
+      'helperId': helperId,
+      'helperName': helperName,
     };
   }
 
-  // alias عشان كود CreateRequest القديم اللي بينادي toJson() يفضل شغال
   Map<String, dynamic> toJson() => toMap();
 
   // ---------- التحويل مع الـ Entity ----------
@@ -135,6 +149,7 @@ class RequestModel {
       requesterRating: entity.requesterRating, requesterRatingCount: entity.requesterRatingCount,
       attachments: entity.attachments, preferredTime: entity.preferredTime,
       location: entity.location, availability: entity.availability,
+      status: entity.status, helperId: entity.helperId, helperName: entity.helperName,
     );
   }
 
@@ -146,31 +161,32 @@ class RequestModel {
       requesterInitials: requesterInitials, requesterRating: requesterRating,
       requesterRatingCount: requesterRatingCount, attachments: attachments,
       preferredTime: preferredTime, location: location, availability: availability,
+      status: status, helperId: helperId, helperName: helperName,
     );
   }
+
   RequestModel copyWith({
-  String? requesterName,
-  String? requesterInitials,
-  double? requesterRating,
-  int? requesterRatingCount,
-}) {
-  return RequestModel(
-    id: id,
-    title: title,
-    description: description,
-    category: category,
-    skillNeeded: skillNeeded,
-    tags: tags,
-    createdAt: createdAt,
-    requesterId: requesterId,
-    requesterName: requesterName ?? this.requesterName,
-    requesterInitials: requesterInitials ?? this.requesterInitials,
-    requesterRating: requesterRating ?? this.requesterRating,
-    requesterRatingCount: requesterRatingCount ?? this.requesterRatingCount,
-    attachments: attachments,
-    preferredTime: preferredTime,
-    location: location,
-    availability: availability,
-  );
-}
+    String? requesterName,
+    String? requesterInitials,
+    double? requesterRating,
+    int? requesterRatingCount,
+    RequestStatus? status,
+    String? helperId,
+    String? helperName,
+  }) {
+    return RequestModel(
+      id: id, title: title, description: description, category: category,
+      skillNeeded: skillNeeded, tags: tags, createdAt: createdAt,
+      requesterId: requesterId,
+      requesterName: requesterName ?? this.requesterName,
+      requesterInitials: requesterInitials ?? this.requesterInitials,
+      requesterRating: requesterRating ?? this.requesterRating,
+      requesterRatingCount: requesterRatingCount ?? this.requesterRatingCount,
+      attachments: attachments, preferredTime: preferredTime,
+      location: location, availability: availability,
+      status: status ?? this.status,
+      helperId: helperId ?? this.helperId,
+      helperName: helperName ?? this.helperName,
+    );
+  }
 }

@@ -12,38 +12,41 @@ class NotificationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      onTap: onTap,
-      tileColor: notification.isRead ? null : AppColors.primaryColor.withOpacity(0.06),
-      leading: CircleAvatar(
-        backgroundColor: AppColors.primaryColor,
-        backgroundImage: notification.senderAvatarUrl != null
-            ? NetworkImage(notification.senderAvatarUrl!)
-            : null,
-        child: notification.senderAvatarUrl == null
-            ? Text(
-                notification.senderName.isNotEmpty ? notification.senderName[0].toUpperCase() : '?',
-                style: const TextStyle(color: Colors.white),
-              )
-            : null,
-      ),
-      title: Text(
-        notification.title,
-        style: TextStyle(
-          fontSize: 14.sp,
-          fontWeight: notification.isRead ? FontWeight.normal : FontWeight.bold,
-          color: AppColors.largeTextColor,
+    return Material(
+      color: Colors.transparent,
+      child: ListTile(
+        onTap: onTap,
+        tileColor: notification.isRead ? null : AppColors.primaryColor.withValues(alpha: 0.06),
+        leading: CircleAvatar(
+          backgroundColor: AppColors.primaryColor,
+          backgroundImage: notification.senderAvatarUrl != null
+              ? NetworkImage(notification.senderAvatarUrl!)
+              : null,
+          child: notification.senderAvatarUrl == null
+              ? Text(
+                  notification.senderName.isNotEmpty ? notification.senderName[0].toUpperCase() : '?',
+                  style: const TextStyle(color: Colors.white),
+                )
+              : null,
         ),
-      ),
-      subtitle: Text(
-        notification.body,
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-        style: TextStyle(fontSize: 12.sp, color: AppColors.mediumTextColor),
-      ),
-      trailing: Text(
-        timeago.format(notification.createdAt),
-        style: TextStyle(fontSize: 11.sp, color: AppColors.mediumTextColor),
+        title: Text(
+          notification.title,
+          style: TextStyle(
+            fontSize: 14.sp,
+            fontWeight: notification.isRead ? FontWeight.normal : FontWeight.bold,
+            color: AppColors.largeTextColor,
+          ),
+        ),
+        subtitle: Text(
+          notification.body,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(fontSize: 12.sp, color: AppColors.mediumTextColor),
+        ),
+        trailing: Text(
+          timeago.format(notification.createdAt),
+          style: TextStyle(fontSize: 11.sp, color: AppColors.mediumTextColor),
+        ),
       ),
     );
   }
