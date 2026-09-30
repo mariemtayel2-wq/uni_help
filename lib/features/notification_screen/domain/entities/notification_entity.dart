@@ -28,6 +28,12 @@ class NotificationEntity {
   final String senderName;
   final String? senderAvatarUrl;
 
+  String get senderInitials {
+    final parts = senderName.trim().split(RegExp(r'\s+')).where((part) => part.isNotEmpty).toList();
+    if (parts.isEmpty) return '?';
+    return parts.take(2).map((part) => part[0].toUpperCase()).join();
+  }
+
   final String? chatId;
   final RequestEntity? request;
 
