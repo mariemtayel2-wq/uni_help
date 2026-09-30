@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:uni_help/core/entities/request_entity.dart';
 import 'package:uni_help/core/theme/app_colors.dart';
+import 'package:uni_help/features/chat_screen/presentation/view/screen/chat_screen.dart';
 import 'package:url_launcher/url_launcher.dart'; // لتشغيل فتح روابط الملفات خارجياً
 import 'package:intl/intl.dart';
 class RequestDetailsScreen extends StatelessWidget {
@@ -246,7 +247,23 @@ _InfoRow(
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28.r)),
                     elevation: 0,
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                      final requestId = request.id;
+                      if (requestId == null || requestId.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('This request has no valid ID.')),
+                        );
+                        return;
+                      }
+
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => ChatScreen(
+                      otherUserId: request.requesterId,
+                      otherUserName: request.requesterName,
+                      otherUserInitials: request.requesterInitials,
+                        requestId: requestId,
+                    )));
+
+                  },
                   child: Text(
                     'Offer Help',
                     style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, color: Colors.white),

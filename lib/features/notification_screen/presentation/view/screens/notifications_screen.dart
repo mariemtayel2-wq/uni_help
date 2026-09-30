@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uni_help/core/theme/app_colors.dart';
+import 'package:uni_help/features/chat_screen/presentation/view/screen/chat_screen.dart';
 import 'package:uni_help/features/notification_screen/domain/entities/notification_entity.dart';
 import 'package:uni_help/features/notification_screen/presentation/view/notification_shimmer.dart';
 import 'package:uni_help/features/notification_screen/presentation/view/widget/notification_tile.dart';
@@ -19,7 +20,13 @@ class NotificationsScreen extends StatelessWidget {
     if (!context.mounted) return;
 
     if (n.chatId != null) {
-      // Navigator.push(context, MaterialPageRoute(builder: (_) => ChatScreen(chatId: n.chatId!)));
+      Navigator.push(context, MaterialPageRoute(builder: (_) => ChatScreen(
+        requestId: n.chatId!,
+        otherUserId: n.senderId,
+        otherUserName: n.senderName,
+        otherUserInitials: n.senderInitials,
+      )
+      ));
     } else if (n.request != null) {
       Navigator.push(
         context,
@@ -59,7 +66,7 @@ class NotificationsScreen extends StatelessWidget {
           }
           return ListView.separated(
             itemCount: list.length,
-            separatorBuilder: (_, __) => const Divider(height: 1),
+            separatorBuilder: (_, _) => const Divider(height: 1),
             itemBuilder: (_, i) => NotificationTile(
               notification: list[i],
               onTap: () => _handleTap(context, list[i]),

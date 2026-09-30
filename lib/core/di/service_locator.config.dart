@@ -31,7 +31,7 @@ import 'package:uni_help/features/authentication/data/repo/auth_remote_data_sour
 import 'package:uni_help/features/authentication/data/repo/auth_remote_repo_imp.dart'
     as _i551;
 import 'package:uni_help/features/authentication/domain/repo/auth_remote_data_source.dart'
-    as _i298;
+    as _i299;
 import 'package:uni_help/features/authentication/domain/repo/auth_remote_repo.dart'
     as _i782;
 import 'package:uni_help/features/authentication/domain/use_case/forget_pass_use_case.dart'
@@ -52,6 +52,22 @@ import 'package:uni_help/features/authentication/presentation/view_model/registe
     as _i50;
 import 'package:uni_help/features/authentication/presentation/view_model/resend_verification_cubit.dart'
     as _i487;
+import 'package:uni_help/features/chat_screen/data/repo/chat_data_source_imp.dart'
+    as _i298;
+import 'package:uni_help/features/chat_screen/data/repo/chat_repo_imp.dart'
+    as _i28;
+import 'package:uni_help/features/chat_screen/domain/repo/chat_data_source.dart'
+    as _i543;
+import 'package:uni_help/features/chat_screen/domain/repo/chat_repo.dart'
+    as _i78;
+import 'package:uni_help/features/chat_screen/domain/use_case/create_chat_use_case.dart'
+    as _i29;
+import 'package:uni_help/features/chat_screen/domain/use_case/send_message_use_case.dart'
+    as _i37;
+import 'package:uni_help/features/chat_screen/domain/use_case/watch_message_use_case.dart'
+    as _i675;
+import 'package:uni_help/features/chat_screen/presentation/view_model/chat_cubit.dart'
+    as _i527;
 import 'package:uni_help/features/create_request/data/repo/create_request_data_source_imp.dart'
     as _i784;
 import 'package:uni_help/features/create_request/data/repo/create_request_repo_imp.dart'
@@ -113,7 +129,10 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i101.SecureStorageHelper>(
       () => _i101.SecureStorageHelper(),
     );
-    gh.lazySingleton<_i298.AuthRemoteDataSource>(
+    gh.lazySingleton<_i543.ChatRemoteDataSource>(
+      () => _i298.ChatRemoteDataSourceImpl(),
+    );
+    gh.lazySingleton<_i299.AuthRemoteDataSource>(
       () => _i266.AuthRemoteDataSourceImpl(),
     );
     gh.lazySingleton<_i700.CreateRequestRemoteDataSource>(
@@ -125,13 +144,32 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i412.HomeRemoteDataSource>(
       () => _i685.HomeRemoteDataSourceImpl(),
     );
+    gh.lazySingleton<_i78.ChatRepository>(
+      () => _i28.ChatRepositoryImpl(gh<_i543.ChatRemoteDataSource>()),
+    );
     gh.factory<_i409.CreateRequestRepository>(
       () => _i1039.CreateRequestRepositoryImpl(
         remoteDataSource: gh<_i700.CreateRequestRemoteDataSource>(),
       ),
     );
+    gh.lazySingleton<_i29.GetOrCreateChatUseCase>(
+      () => _i29.GetOrCreateChatUseCase(gh<_i78.ChatRepository>()),
+    );
+    gh.lazySingleton<_i37.SendMessageUseCase>(
+      () => _i37.SendMessageUseCase(gh<_i78.ChatRepository>()),
+    );
+    gh.lazySingleton<_i675.WatchMessagesUseCase>(
+      () => _i675.WatchMessagesUseCase(gh<_i78.ChatRepository>()),
+    );
+    gh.factory<_i527.ChatCubit>(
+      () => _i527.ChatCubit(
+        gh<_i29.GetOrCreateChatUseCase>(),
+        gh<_i675.WatchMessagesUseCase>(),
+        gh<_i37.SendMessageUseCase>(),
+      ),
+    );
     gh.lazySingleton<_i782.AuthRepository>(
-      () => _i551.AuthRepositoryImpl(gh<_i298.AuthRemoteDataSource>()),
+      () => _i551.AuthRepositoryImpl(gh<_i299.AuthRemoteDataSource>()),
     );
     gh.lazySingleton<_i1026.ForgotPasswordUseCase>(
       () => _i1026.ForgotPasswordUseCase(gh<_i782.AuthRepository>()),
