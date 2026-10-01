@@ -38,14 +38,20 @@ Future<void> login(LoginEntity entity) async {
         userEmail = docSnapshot.data()?['email'];
       } else {
         // 2. المحاولة الثانية (للحسابات القديمة): البحث داخل مجموعة users
-        final userQuery = await _firestore
-            .collection(_usersCollection)
-            .where('universityId', isEqualTo: input)
-            .limit(1)
-            .get();
+        // ملحوظة: users محتاجة تسجيل دخول في الـ Rules، فالـ query ده هيتمنع قبل الـ login.
+        // بنتجاهل الخطأ هنا عشان تظهر رسالة "No account found" بدل رسالة الصلاحيات.
+        try {
+          final userQuery = await _firestore
+              .collection(_usersCollection)
+              .where('universityId', isEqualTo: input)
+              .limit(1)
+              .get();
 
-        if (userQuery.docs.isNotEmpty) {
-          userEmail = userQuery.docs.first.data()['email'];
+          if (userQuery.docs.isNotEmpty) {
+            userEmail = userQuery.docs.first.data()['email'];
+          }
+        } on FirebaseException catch (_) {
+          // نكمل ونعتبره مش لاقيه.
         }
       }
 
@@ -93,27 +99,22 @@ Future<void> login(LoginEntity entity) async {
           .set(userModel.toMap());
 
       // 2. حفظ رابط الـ University ID بالأيميل والـ UID للمستقبل
-      if (entity.universityId!.trim().isNotEmpty) {
+      // (مرة واحدة بس، بحروف صغيرة عشان الـ login بيدور بنفس الشكل)
+      final universityId = entity.universityId?.trim() ?? '';
+      if (universityId.isNotEmpty) {
         await _firestore
             .collection(_universityIdsCollection)
-            .doc(entity.universityId!.trim())
+            .doc(universityId.toLowerCase())
             .set({
           'email': entity.email.trim(),
           'uid': credential.user!.uid,
         });
       }
-        if (entity.universityId!.trim().isNotEmpty) {
-  final cleanId = entity.universityId!.trim().toLowerCase();
-  await _firestore
-      .collection(_universityIdsCollection)
-      .doc(cleanId)
-      .set({
-    'email': entity.email.trim(),
-    'uid': credential.user!.uid,
-  });
-}
     } on FirebaseAuthException catch (e) {
       throw Exception(_mapFirebaseError(e));
+    } on FirebaseException catch (e) {
+      // خطأ Firestore بعد ما الحساب اتكريت في Auth.
+      throw Exception('Failed to save your account data: ${e.message ?? e.code}');
     }
   }
 

@@ -3,12 +3,19 @@ import 'package:uni_help/features/chat_screen/domain/entities/message_entity.dar
 
 
 class MessageModel {
-  const MessageModel({required this.id, required this.text, required this.senderId, required this.createdAt});
+  const MessageModel({
+    required this.id,
+    required this.text,
+    required this.senderId,
+    required this.createdAt,
+    this.isPending = false,
+  });
 
   final String id;
   final String text;
   final String senderId;
   final DateTime createdAt;
+  final bool isPending;
 
   factory MessageModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data() ?? {};
@@ -16,7 +23,9 @@ class MessageModel {
       id: doc.id,
       text: data['text'] as String? ?? '',
       senderId: data['senderId'] as String? ?? '',
+      // الـ serverTimestamp بيبقى null لحد ما السيرفر يرد، فبنستخدم الوقت الحالي مؤقتاً.
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      isPending: doc.metadata.hasPendingWrites,
     );
   }
 
@@ -24,5 +33,6 @@ class MessageModel {
     return {'text': text, 'senderId': senderId, 'createdAt': FieldValue.serverTimestamp()};
   }
 
-  MessageEntity toEntity() => MessageEntity(id: id, text: text, senderId: senderId, createdAt: createdAt);
+  MessageEntity toEntity() =>
+      MessageEntity(id: id, text: text, senderId: senderId, createdAt: createdAt, isPending: isPending);
 }

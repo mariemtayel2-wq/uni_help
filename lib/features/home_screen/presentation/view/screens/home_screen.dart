@@ -11,6 +11,7 @@ import 'package:uni_help/core/services/notification_permision.dart';
 import 'package:uni_help/core/theme/app_colors.dart';
 import 'package:uni_help/features/app_section/view_model/app_section_cubit.dart';
 import 'package:uni_help/features/app_section/view_model/app_section_state.dart';
+import 'package:uni_help/features/chat_screen/presentation/view/screen/chat_list_screen.dart';
 import 'package:uni_help/features/home_screen/presentation/view/screens/request_card.dart';
 import 'package:uni_help/features/home_screen/presentation/view/utils/home_shimmer.dart';
 import 'package:uni_help/features/home_screen/presentation/view_model/home_cubit.dart';
@@ -179,9 +180,18 @@ class _Header extends StatelessWidget {
               "Let's make a difference today",
               style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: AppColors.largeTextColor),
             ),
+          
           ],
         ),
-     
+        IconButton(
+  onPressed: () {
+    Navigator.push(context, MaterialPageRoute(builder: (_) => const ChatsListScreen()));
+  },
+  icon: Transform.flip(
+    flipX: true,
+    child: Icon(Icons.chat, color: AppColors.mediumTextColor),
+  ),
+),
       ],
     );
   }

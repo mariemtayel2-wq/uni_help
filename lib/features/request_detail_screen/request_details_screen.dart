@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:uni_help/core/entities/request_entity.dart';
@@ -255,12 +256,18 @@ _InfoRow(
                         );
                         return;
                       }
-
+                      if (request.requesterId == FirebaseAuth.instance.currentUser!.uid) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(content: Text('You cannot offer help on your own request.')),
+  );
+  return;
+}
                     Navigator.push(context, MaterialPageRoute(builder: (_) => ChatScreen(
                       otherUserId: request.requesterId,
                       otherUserName: request.requesterName,
                       otherUserInitials: request.requesterInitials,
                         requestId: requestId,
+                        applicantId: FirebaseAuth.instance.currentUser!.uid,
                     )));
 
                   },

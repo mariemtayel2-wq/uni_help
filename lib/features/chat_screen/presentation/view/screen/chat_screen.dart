@@ -3,14 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:uni_help/core/di/service_locator.dart';
+import 'package:uni_help/core/services/presence_service.dart';
 import 'package:uni_help/core/theme/app_colors.dart';
 import 'package:uni_help/features/chat_screen/domain/entities/message_entity.dart';
+import 'package:uni_help/features/chat_screen/presentation/view/screen/chat_shimmer.dart';
 import 'package:uni_help/features/chat_screen/presentation/view_model/chat_cubit.dart';
 import 'package:uni_help/features/chat_screen/presentation/view_model/chat_state_cubit.dart';
 
 class ChatScreen extends StatelessWidget {
   const ChatScreen({
     required this.requestId,
+    required this.applicantId,
     required this.otherUserId,
     required this.otherUserName,
     required this.otherUserInitials,
@@ -18,6 +21,9 @@ class ChatScreen extends StatelessWidget {
   });
 
   final String requestId;
+
+  /// المتقدم على الطلب: لو أنا المتقدم يبقى myUid، ولو أنا صاحب الطلب يبقى otherUserId.
+  final String applicantId;
   final String otherUserId;
   final String otherUserName;
   final String otherUserInitials;
@@ -25,15 +31,30 @@ class ChatScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => serviceLocator<ChatCubit>()..openChat(requestId: requestId, requesterId: otherUserId),
-      child: _ChatView(otherUserName: otherUserName, otherUserInitials: otherUserInitials),
+      create: (_) {
+        final myUid = FirebaseAuth.instance.currentUser?.uid ?? '';
+        // لو أنا المتقدم يبقى صاحب الطلب هو الطرف التاني، والعكس صحيح.
+        final requesterId = applicantId == myUid ? otherUserId : myUid;
+        return serviceLocator<ChatCubit>()
+          ..openChat(requestId: requestId, requesterId: requesterId, applicantId: applicantId);
+      },
+      child: _ChatView(
+        otherUserId: otherUserId,
+        otherUserName: otherUserName,
+        otherUserInitials: otherUserInitials,
+      ),
     );
   }
 }
 
 class _ChatView extends StatefulWidget {
-  const _ChatView({required this.otherUserName, required this.otherUserInitials});
+  const _ChatView({
+    required this.otherUserId,
+    required this.otherUserName,
+    required this.otherUserInitials,
+  });
 
+  final String otherUserId;
   final String otherUserName;
   final String otherUserInitials;
 
@@ -44,6 +65,9 @@ class _ChatView extends StatefulWidget {
 class _ChatViewState extends State<_ChatView> {
   final _messageController = TextEditingController();
   final _scrollController = ScrollController();
+
+  // بنعمل الـ stream مرة واحدة هنا عشان ما يتعملش subscribe جديد مع كل rebuild.
+  late final Stream<bool> _onlineStream = serviceLocator<PresenceService>().watchOnline(widget.otherUserId);
 
   String get _currentUserId => FirebaseAuth.instance.currentUser?.uid ?? '';
 
@@ -101,18 +125,26 @@ class _ChatViewState extends State<_ChatView> {
                   widget.otherUserName,
                   style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold, color: AppColors.largeTextColor),
                 ),
-                // TODO: حالة "Online" الحقيقية محتاجة presence system منفصل
-                // (Realtime Database عادةً) — دي شكل ثابت دلوقتي بس.
-                Row(
-                  children: [
-                    Container(
-                      width: 7.w,
-                      height: 7.w,
-                      decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle),
-                    ),
-                    SizedBox(width: 4.w),
-                    Text('Online', style: TextStyle(fontSize: 11.sp, color: Colors.green)),
-                  ],
+                // حالة الـ Online الحقيقية من Realtime Database.
+                StreamBuilder<bool>(
+                  stream: _onlineStream,
+                  initialData: false,
+                  builder: (context, snapshot) {
+                    final isOnline = snapshot.data ?? false;
+                    final color = isOnline ? Colors.green : Colors.grey;
+
+                    return Row(
+                      children: [
+                        Container(
+                          width: 7.w,
+                          height: 7.w,
+                          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                        ),
+                        SizedBox(width: 4.w),
+                        Text(isOnline ? 'Online' : 'Offline', style: TextStyle(fontSize: 11.sp, color: color)),
+                      ],
+                    );
+                  },
                 ),
               ],
             ),
@@ -128,7 +160,7 @@ class _ChatViewState extends State<_ChatView> {
             BlocBuilder<ChatCubit, ChatState>(
               builder: (context, state) {
                 if (state is ChatLoading || state is ChatInitial) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const ChatShimmer();
                 }
 
                 if (state is ChatError) {
@@ -171,6 +203,8 @@ class _MessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final metaColor = isMine ? Colors.white70 : AppColors.mediumTextColor;
+
     return Align(
       alignment: isMine ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
@@ -195,9 +229,19 @@ class _MessageBubble extends StatelessWidget {
               style: TextStyle(fontSize: 14.sp, color: isMine ? Colors.white : AppColors.largeTextColor),
             ),
             SizedBox(height: 4.h),
-            Text(
-              '${message.createdAt.hour.toString().padLeft(2, '0')}:${message.createdAt.minute.toString().padLeft(2, '0')}',
-              style: TextStyle(fontSize: 10.sp, color: isMine ? Colors.white70 : AppColors.mediumTextColor),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '${message.createdAt.hour.toString().padLeft(2, '0')}:${message.createdAt.minute.toString().padLeft(2, '0')}',
+                  style: TextStyle(fontSize: 10.sp, color: metaColor),
+                ),
+                // أيقونة الساعة لحد ما الرسالة تتأكد من السيرفر.
+                if (message.isPending) ...[
+                  SizedBox(width: 4.w),
+                  Icon(Icons.access_time, size: 10.sp, color: metaColor),
+                ],
+              ],
             ),
           ],
         ),

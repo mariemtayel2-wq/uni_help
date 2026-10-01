@@ -20,11 +20,19 @@ class ChatCubit extends Cubit<ChatState> {
 
   StreamSubscription<List<MessageEntity>>? _messagesSubscription;
 
-  Future<void> openChat({required String requestId, required String requesterId}) async {
+  Future<void> openChat({
+    required String requestId,
+    required String requesterId,
+    required String applicantId,
+  }) async {
     emit(const ChatLoading());
 
     try {
-      final chatId = await _getOrCreateChatUseCase(requestId: requestId, requesterId: requesterId);
+      final chatId = await _getOrCreateChatUseCase(
+        requestId: requestId,
+        requesterId: requesterId,
+        applicantId: applicantId,
+      );
 
       await _messagesSubscription?.cancel();
 

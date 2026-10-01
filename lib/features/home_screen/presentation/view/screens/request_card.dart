@@ -45,10 +45,7 @@ class RequestCard extends StatelessWidget {
                     style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w600, color: AppColors.primaryColor),
                   ),
                 ),
-                InkWell(
-                  onTap: onMoreTap,
-                  child: Icon(Icons.more_vert, size: 20.sp, color: AppColors.mediumTextColor),
-                ),
+               
               ],
             ),
             SizedBox(height: 10.h),

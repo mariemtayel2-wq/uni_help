@@ -10,20 +10,26 @@ class LoginCubit extends Cubit<LoginState> {
   final LoginUseCase _loginUseCase;
   final GoogleSignInUseCase _googleSignInUseCase;
   Future<void> login(LoginEntity entity) async {
+    if (isClosed) return;
     emit(const LoginLoading());
     try {
       await _loginUseCase(entity);
+      if (isClosed) return;
       emit(const LoginSuccess());
     } catch (e) {
+      if (isClosed) return;
       emit(LoginError(e.toString().replaceFirst('Exception: ', '')));
     }
   }
   Future<void> signInWithGoogle() async {
+    if (isClosed) return;
     emit(const LoginLoading());
     try {
       await _googleSignInUseCase();
+      if (isClosed) return;
       emit(const LoginSuccess());
     } catch (e) {
+      if (isClosed) return;
       emit(LoginError(e.toString().replaceFirst('Exception: ', '')));
     }
   }

@@ -19,15 +19,20 @@ class NotificationsScreen extends StatelessWidget {
     await context.read<NotificationsCubit>().onNotificationTapped(uid, n);
     if (!context.mounted) return;
 
-    if (n.chatId != null) {
-      Navigator.push(context, MaterialPageRoute(builder: (_) => ChatScreen(
-        requestId: n.chatId!,
-        otherUserId: n.senderId,
-        otherUserName: n.senderName,
-        otherUserInitials: n.senderInitials,
-      )
-      ));
-    } else if (n.request != null) {
+  if (n.chatId != null) {
+  final chatId = n.chatId!;
+  final sep = chatId.lastIndexOf('_');
+  final requestId = chatId.substring(0, sep);
+  final applicantId = chatId.substring(sep + 1);
+
+  Navigator.push(context, MaterialPageRoute(builder: (_) => ChatScreen(
+    requestId: requestId,
+    applicantId: applicantId,
+    otherUserId: n.senderId,
+    otherUserName: n.senderName,
+    otherUserInitials: n.senderInitials,
+  )));
+} else if (n.request != null) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => RequestDetailsScreen(request: n.request!)),
