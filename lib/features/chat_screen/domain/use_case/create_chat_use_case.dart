@@ -8,6 +8,6 @@ class GetOrCreateChatUseCase {
 
   final ChatRepository _repository;
 
-  Future<String> call({required String requestId, required String requesterId}) =>
-      _repository.getOrCreateChat(requestId: requestId, requesterId: requesterId);
+  Future<String> call({required String requestId, required String requesterId, required String applicantId}) =>
+      _repository.getOrCreateChat(requestId: requestId, requesterId: requesterId, applicantId: applicantId);
 }

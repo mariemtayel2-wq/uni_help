@@ -64,8 +64,6 @@ class _SkillsEditorState extends State<SkillsEditor> {
             ),
           if (widget.skills.isNotEmpty) SizedBox(height: 12.h),
 
-          // ⬅️ استخدام CustomTextField بدل TextField العادي
-          // والـ "+" بقى suffixIcon جوه الفيلد بدل زرار منفصل
           CustomTextField(
             controller: _controller,
             hintText: 'e.g. Flutter, UI/UX...',

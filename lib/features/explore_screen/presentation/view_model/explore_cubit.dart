@@ -14,14 +14,17 @@ class ExploreCubit extends Cubit<ExploreState> {
   List<RequestEntity> _categoryResults = [];
 
   Future<void> loadExplore({String category = 'All'}) async {
+    if (isClosed) return;
     emit(const ExploreLoading());
 
     try {
       final requests = await _getRecentRequestsUseCase(category: category, limit: 50);
+      if (isClosed) return;
       _categoryResults = requests;
 
       emit(ExploreLoaded(results: requests, selectedCategory: category, searchQuery: ''));
     } catch (e) {
+      if (isClosed) return;
       emit(ExploreError(e.toString().replaceFirst('Exception: ', '')));
     }
   }

@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:uni_help/core/di/service_locator.dart';
 import 'package:uni_help/core/entities/profile_entity.dart';
+import 'package:uni_help/core/services/presence_service.dart';
 import 'package:uni_help/features/profile_screen/domain/use_case/add_skills_use_case.dart';
 import 'package:uni_help/features/profile_screen/domain/use_case/watch_profile_use_case.dart';
 import 'package:uni_help/features/profile_screen/domain/use_case/remove_skills_use_case.dart';
@@ -37,6 +40,8 @@ class ProfileCubit extends Cubit<ProfileState> {
   Future<void> removeSkill(String skill) => removeSkillUseCase(skill);
 
   Future<void> logout() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) await serviceLocator<PresenceService>().goOffline(uid);
     await logoutUseCase();
     emit(ProfileLoggedOut());
   }
