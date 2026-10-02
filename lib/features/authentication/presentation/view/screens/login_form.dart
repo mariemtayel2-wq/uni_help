@@ -7,7 +7,7 @@ import 'package:uni_help/core/common/widget/app_toast.dart';
 import 'package:uni_help/core/common/widget/custum_text_form_field.dart';
 import 'package:uni_help/core/routing/app_route.dart';
 import 'package:uni_help/core/theme/app_colors.dart';
-import 'package:uni_help/core/vaildators/app_vaildator.dart';
+import 'package:uni_help/core/validators/app_vaildator.dart';
 import 'package:uni_help/features/authentication/domain/entities/login_entity.dart';
 import 'package:uni_help/features/authentication/presentation/view_model/login_cubit.dart';
 import 'package:uni_help/features/authentication/presentation/view_model/login_state_cubit.dart';

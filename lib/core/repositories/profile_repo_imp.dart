@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:injectable/injectable.dart';
 import 'package:uni_help/core/entities/profile_entity.dart';
 import 'package:uni_help/core/model/profile_model.dart';
-import 'package:uni_help/core/reposatries/profile_repo.dart';
+import 'package:uni_help/core/repositories/profile_repo.dart';
 
 @LazySingleton(as: ProfileRepository)
 class ProfileRepositoryImpl implements ProfileRepository {

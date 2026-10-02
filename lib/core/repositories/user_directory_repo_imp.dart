@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:injectable/injectable.dart';
-import 'package:uni_help/core/reposatries/user_directory_repo.dart';
+import 'package:uni_help/core/repositories/user_directory_repo.dart';
 
 @LazySingleton(as: UsersDirectoryRepository)
 class UsersDirectoryRepositoryImpl implements UsersDirectoryRepository {

@@ -1,5 +1,5 @@
 import 'package:injectable/injectable.dart';
-import 'package:uni_help/core/reposatries/profile_repo.dart';
+import 'package:uni_help/core/repositories/profile_repo.dart';
 
 @lazySingleton
 class RemoveSkillUseCase {
