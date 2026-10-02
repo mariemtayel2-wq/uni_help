@@ -32,6 +32,8 @@ class ExploreCubit extends Cubit<ExploreState> {
   Future<void> changeCategory(String category) => loadExplore(category: category);
 
   void search(String query) {
+    if (isClosed) return;
+
     final current = state;
     if (current is! ExploreLoaded) return;
 
