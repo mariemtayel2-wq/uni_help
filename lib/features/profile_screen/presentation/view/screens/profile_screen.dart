@@ -4,13 +4,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:uni_help/core/di/service_locator.dart';
 import 'package:uni_help/core/theme/app_colors.dart';
 import 'package:uni_help/features/my_requests/presentation/view/screen/my_request_screen.dart';
+import 'package:uni_help/features/profile_screen/presentation/view/screens/about_uni_help_screen.dart';
 import 'package:uni_help/features/profile_screen/presentation/view/widgets/profile_shimmer.dart';
 import 'package:uni_help/features/profile_screen/presentation/view/widgets/setting_tile.dart';
 import 'package:uni_help/features/profile_screen/presentation/view_model/profile_cubit.dart';
 import 'package:uni_help/features/profile_screen/presentation/view/widgets/profile_header.dart';
 import 'package:uni_help/features/profile_screen/presentation/view/widgets/skills_editor.dart';
 import 'package:uni_help/features/profile_screen/presentation/view_model/profile_state_cubit.dart';
-
+import 'package:uni_help/features/profile_screen/presentation/view/screens/help_and_support_screen.dart';
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
@@ -76,9 +77,13 @@ class _ProfileView extends StatelessWidget {
                   decoration: BoxDecoration(color: AppColors.white, borderRadius: BorderRadius.circular(16.r)),
                   child: Column(
                     children: [
-                      SettingsTile(icon: Icons.help_outline, title: 'Help & Support', onTap: () {}),
+                      SettingsTile(icon: Icons.help_outline, title: 'Help & Support', onTap: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => const SupportScreen()));
+                      }),
                       const Divider(height: 1),
-                      SettingsTile(icon: Icons.info_outline, title: 'About UniHelp', onTap: () {}),
+                      SettingsTile(icon: Icons.info_outline, title: 'About UniHelp', onTap: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutScreen()));
+                      }),
                     ],
                   ),
                 ),
