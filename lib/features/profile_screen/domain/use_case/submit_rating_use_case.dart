@@ -1,6 +1,6 @@
 import 'package:injectable/injectable.dart';
 import 'package:uni_help/core/entities/rating_entity.dart';
-import 'package:uni_help/core/reposatries/rating_repo.dart';
+import 'package:uni_help/core/repositories/rating_repo.dart';
 
 @lazySingleton
 class SubmitRatingUseCase {

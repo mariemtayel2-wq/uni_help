@@ -1,6 +1,6 @@
 import 'package:injectable/injectable.dart';
 import 'package:uni_help/core/entities/request_entity.dart';
-import 'package:uni_help/core/reposatries/user_directory_repo.dart';
+import 'package:uni_help/core/repositories/user_directory_repo.dart';
 import 'package:uni_help/features/notification_screen/domain/enums/notification_type.dart';
 import 'package:uni_help/features/notification_screen/domain/use_case/send_notification_use_case.dart';
 

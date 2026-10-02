@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:injectable/injectable.dart';
 import 'package:uni_help/core/entities/request_entity.dart';
 import 'package:uni_help/core/model/request_dto.dart';
-import 'package:uni_help/core/reposatries/request_repo.dart';
+import 'package:uni_help/core/repositories/request_repo.dart';
 
 @LazySingleton(as: RequestsRepository)
 class RequestsRepositoryImpl implements RequestsRepository {

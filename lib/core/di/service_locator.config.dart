@@ -16,14 +16,14 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart'
     as _i163;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
-import 'package:uni_help/core/reposatries/profile_repo.dart' as _i235;
-import 'package:uni_help/core/reposatries/profile_repo_imp.dart' as _i507;
-import 'package:uni_help/core/reposatries/rating_repo.dart' as _i1000;
-import 'package:uni_help/core/reposatries/rating_repo_imp.dart' as _i126;
-import 'package:uni_help/core/reposatries/request_repo.dart' as _i556;
-import 'package:uni_help/core/reposatries/request_repo_imp.dart' as _i249;
-import 'package:uni_help/core/reposatries/user_directory_repo.dart' as _i339;
-import 'package:uni_help/core/reposatries/user_directory_repo_imp.dart'
+import 'package:uni_help/core/repositories/profile_repo.dart' as _i235;
+import 'package:uni_help/core/repositories/profile_repo_imp.dart' as _i507;
+import 'package:uni_help/core/repositories/rating_repo.dart' as _i1000;
+import 'package:uni_help/core/repositories/rating_repo_imp.dart' as _i126;
+import 'package:uni_help/core/repositories/request_repo.dart' as _i556;
+import 'package:uni_help/core/repositories/request_repo_imp.dart' as _i249;
+import 'package:uni_help/core/repositories/user_directory_repo.dart' as _i339;
+import 'package:uni_help/core/repositories/user_directory_repo_imp.dart'
     as _i104;
 import 'package:uni_help/core/services/cloudinary_service.dart' as _i506;
 import 'package:uni_help/core/services/local_notification.dart' as _i187;

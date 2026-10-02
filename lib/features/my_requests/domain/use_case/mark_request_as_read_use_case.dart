@@ -1,5 +1,5 @@
 import 'package:injectable/injectable.dart';
-import 'package:uni_help/core/reposatries/request_repo.dart';
+import 'package:uni_help/core/repositories/request_repo.dart';
 
 @lazySingleton
 class MarkRequestCompletedUseCase {
