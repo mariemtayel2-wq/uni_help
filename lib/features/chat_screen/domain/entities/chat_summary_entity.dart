@@ -14,6 +14,8 @@ class ChatSummaryEntity {
   final DateTime lastMessageAt;
 
   // الـ participants بتتخزن دايماً [requesterId, applicantId].
+  String get requesterId => participants.isNotEmpty ? participants.first : '';
+
   String get applicantId => participants.length > 1 ? participants[1] : '';
 
   String otherUserId(String currentUserId) =>

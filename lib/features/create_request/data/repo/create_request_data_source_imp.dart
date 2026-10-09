@@ -19,7 +19,7 @@ class CreateRequestRemoteDataSourceImpl
   });
 
   @override
-  Future<void> createRequest(
+  Future<String> createRequest(
     RequestModel requestModel,
     File? attachment,
   ) async {
@@ -81,9 +81,10 @@ class CreateRequestRemoteDataSourceImpl
         requestData['preferredTime'] = _formatPreferredTime(preferredTimeValue.toDate());
       }
 
-      await firestore.collection('requests').add(
+      final requestRef = await firestore.collection('requests').add(
         requestData,
       );
+      return requestRef.id;
     } catch (e) {
       throw Exception('Failed to create request: $e');
     }

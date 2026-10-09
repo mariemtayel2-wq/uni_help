@@ -88,10 +88,12 @@ class _RateHelperViewState extends State<_RateHelperView> {
         builder: (context, state) {
           final isSubmitting = state is RateHelperStateSubmitting;
 
-          return Padding(
-            padding: EdgeInsets.all(20.w),
-            child: Column(
-              children: [
+          return SafeArea(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(20.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
                 SizedBox(height: 20.h),
                 CircleAvatar(
                   radius: 36.r,
@@ -135,7 +137,6 @@ class _RateHelperViewState extends State<_RateHelperView> {
                   ),
                   onChanged: (_) => setState(() {}),
                 ),
-                const Spacer(),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -157,7 +158,8 @@ class _RateHelperViewState extends State<_RateHelperView> {
                         : const Text('Submit', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                   ),
                 ),
-              ],
+                ],
+              ),
             ),
           );
         },

@@ -17,5 +17,6 @@ abstract class NotificationsRepository {
     String? senderAvatarUrl,
     String? chatId,
     RequestEntity? request,
+    String? notificationId,
   });
 }

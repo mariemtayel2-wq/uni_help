@@ -16,14 +16,17 @@ class NotificationModel {
       title: map['title'] as String? ?? '',
       body: map['body'] as String? ?? '',
       isRead: map['isRead'] as bool? ?? false,
-      createdAt: (map['createdAt'] as Timestamp).toDate(),
+      createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       senderId: map['senderId'] as String? ?? '',
       senderName: map['senderName'] as String? ?? '',
       senderAvatarUrl: map['senderAvatarUrl'] as String?,
       chatId: map['chatId'] as String?,
       request: requestMap == null
           ? null
-          : RequestModel.fromMap(requestMap['id'] as String, requestMap).toEntity(),
+          : RequestModel.fromMap(
+              requestMap['id'] as String? ?? '',
+              requestMap,
+            ).toEntity(),
     );
   }
 

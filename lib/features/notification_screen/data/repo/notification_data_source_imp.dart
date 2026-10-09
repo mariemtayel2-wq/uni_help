@@ -5,7 +5,8 @@ import 'package:uni_help/features/notification_screen/domain/entities/notificati
 import 'package:uni_help/features/notification_screen/domain/repo/notification_data_source.dart';
 
 @LazySingleton(as: NotificationsRemoteDataSource)
-class NotificationsRemoteDataSourceImpl implements NotificationsRemoteDataSource {
+class NotificationsRemoteDataSourceImpl
+    implements NotificationsRemoteDataSource {
   NotificationsRemoteDataSourceImpl(this._firestore);
 
   final FirebaseFirestore _firestore;
@@ -16,13 +17,18 @@ class NotificationsRemoteDataSourceImpl implements NotificationsRemoteDataSource
   @override
   Stream<List<NotificationEntity>> watchNotifications(String uid) {
     try {
-      return _col(uid).orderBy('createdAt', descending: true).snapshots().map((snap) {
-        try {
-          return snap.docs.map((d) => NotificationModel.fromMap(d.id, d.data())).toList();
-        } catch (e) {
-          throw Exception('Failed to parse notifications: $e');
-        }
-      });
+      return _col(uid)
+          .orderBy('createdAt', descending: true)
+          .snapshots()
+          .map((snap) {
+            try {
+              return snap.docs
+                  .map((d) => NotificationModel.fromMap(d.id, d.data()))
+                  .toList();
+            } catch (e) {
+              throw Exception('Failed to parse notifications: $e');
+            }
+          });
     } catch (e) {
       throw Exception('Failed to watch notifications: $e');
     }
@@ -54,9 +60,16 @@ class NotificationsRemoteDataSourceImpl implements NotificationsRemoteDataSource
   }
 
   @override
-  Future<void> sendNotification(String targetUid, Map<String, dynamic> data) async {
+  Future<void> sendNotification(
+    String targetUid,
+    Map<String, dynamic> data, {
+    String? notificationId,
+  }) async {
     try {
-      await _col(targetUid).add(data);
+      final ref = notificationId == null
+          ? _col(targetUid).doc()
+          : _col(targetUid).doc(notificationId);
+      await ref.set(data);
     } catch (e) {
       throw Exception('Failed to send notification: $e');
     }

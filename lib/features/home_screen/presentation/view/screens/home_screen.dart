@@ -17,6 +17,7 @@ import 'package:uni_help/features/home_screen/presentation/view/utils/home_shimm
 import 'package:uni_help/features/home_screen/presentation/view_model/home_cubit.dart';
 import 'package:uni_help/features/home_screen/presentation/view_model/home_state_cubit.dart';
 import 'package:uni_help/features/request_detail_screen/request_details_screen.dart';
+import 'package:uni_help/features/profile_screen/presentation/view/screens/user_profile_screen.dart';
 
 const _categories = requestCategories;
 
@@ -140,6 +141,12 @@ class _HomeView extends StatelessWidget {
                     ...loaded.requests.map(
                       (r) => RequestCard(
                         request: r,
+                        onRequesterTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => UserProfileScreen(uid: r.requesterId),
+                          ),
+                        ),
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(builder: (_) => RequestDetailsScreen(request: r)),

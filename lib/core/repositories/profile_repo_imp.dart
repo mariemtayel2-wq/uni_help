@@ -36,6 +36,15 @@ class ProfileRepositoryImpl implements ProfileRepository {
   }
 
   @override
+  Stream<ProfileEntity> watchProfileById(String uid) {
+    return _firestore
+        .collection('users')
+        .doc(uid)
+        .snapshots()
+        .map((snap) => ProfileModel.fromSnapshot(snap).toEntity());
+  }
+
+  @override
   Future<void> addSkill(String skill) async {
     final trimmed = skill.trim();
     if (trimmed.isEmpty) return;

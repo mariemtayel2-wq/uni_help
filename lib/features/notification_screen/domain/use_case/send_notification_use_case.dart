@@ -18,9 +18,13 @@ class SendNotificationUseCase {
     String? senderAvatarUrl,
     String? chatId,
     RequestEntity? request,
+    String? notificationId,
   }) => repo.sendNotification(
         targetUid: targetUid, type: type, title: title, body: body,
         senderId: senderId, senderName: senderName,
-        senderAvatarUrl: senderAvatarUrl, chatId: chatId, request: request,
+        senderAvatarUrl: senderAvatarUrl,
+        chatId: chatId,
+        request: request,
+        notificationId: notificationId,
       );
 }

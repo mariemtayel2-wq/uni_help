@@ -13,6 +13,7 @@ import 'package:uni_help/features/chat_screen/presentation/view_model/chat_state
 class ChatScreen extends StatelessWidget {
   const ChatScreen({
     required this.requestId,
+    required this.requesterId,
     required this.applicantId,
     required this.otherUserId,
     required this.otherUserName,
@@ -21,8 +22,9 @@ class ChatScreen extends StatelessWidget {
   });
 
   final String requestId;
+  final String requesterId;
 
-  /// المتقدم على الطلب: لو أنا المتقدم يبقى myUid، ولو أنا صاحب الطلب يبقى otherUserId.
+  /// The applicant associated with this request's conversation.
   final String applicantId;
   final String otherUserId;
   final String otherUserName;
@@ -32,9 +34,6 @@ class ChatScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) {
-        final myUid = FirebaseAuth.instance.currentUser?.uid ?? '';
-        // لو أنا المتقدم يبقى صاحب الطلب هو الطرف التاني، والعكس صحيح.
-        final requesterId = applicantId == myUid ? otherUserId : myUid;
         return serviceLocator<ChatCubit>()
           ..openChat(requestId: requestId, requesterId: requesterId, applicantId: applicantId);
       },

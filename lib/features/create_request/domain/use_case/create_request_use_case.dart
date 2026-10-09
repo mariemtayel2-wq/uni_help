@@ -10,7 +10,7 @@ class CreateRequestUseCase {
 
   CreateRequestUseCase(this.repository);
 
-  Future<void> call(RequestEntity request, File? attachment) async {
-    return await repository.createRequest(request, attachment);
+  Future<String> call(RequestEntity request, File? attachment) async {
+    return repository.createRequest(request, attachment);
   }
 }
