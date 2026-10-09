@@ -108,6 +108,7 @@ class _ChatTile extends StatelessWidget {
               MaterialPageRoute(
                 builder: (_) => ChatScreen(
                   requestId: chat.requestId,
+                  requesterId: chat.requesterId,
                   applicantId: chat.applicantId,
                   otherUserId: otherUserId,
                   otherUserName: name,

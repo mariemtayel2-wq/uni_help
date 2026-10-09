@@ -13,7 +13,7 @@ class NotificationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.transparent,
+      color: AppColors.white,
       child: ListTile(
         onTap: onTap,
         tileColor: notification.isRead ? null : AppColors.primaryColor.withValues(alpha: 0.06),

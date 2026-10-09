@@ -15,7 +15,10 @@ class LocalNotificationService {
       requestSoundPermission: false,
     );
     await _plugin.initialize(
-      settings: const InitializationSettings(android: androidInit, iOS: iosInit),
+      settings: const InitializationSettings(
+        android: androidInit,
+        iOS: iosInit,
+      ),
     );
   }
 
@@ -30,7 +33,7 @@ class LocalNotificationService {
       iOS: DarwinNotificationDetails(),
     );
     return _plugin.show(
-      id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      id: DateTime.now().millisecondsSinceEpoch.remainder(1 << 31),
       title: title,
       body: body,
       notificationDetails: details,

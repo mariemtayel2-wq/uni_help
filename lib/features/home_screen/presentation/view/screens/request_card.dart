@@ -6,10 +6,17 @@ import 'package:uni_help/core/theme/app_colors.dart';
 import 'package:uni_help/core/utils/time_ago.dart';
 
 class RequestCard extends StatelessWidget {
-  const RequestCard({required this.request, this.onTap, this.onMoreTap, super.key});
+  const RequestCard({
+    required this.request,
+    this.onTap,
+    this.onRequesterTap,
+    this.onMoreTap,
+    super.key,
+  });
 
   final RequestEntity request;
   final VoidCallback? onTap;
+  final VoidCallback? onRequesterTap;
   final VoidCallback? onMoreTap;
 
   @override
@@ -76,9 +83,15 @@ class RequestCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        request.requesterName,
-                        style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600, color: AppColors.largeTextColor),
+                      GestureDetector(
+                        onTap: onRequesterTap,
+                        child: Text(
+                          request.requesterName,
+                          style: TextStyle(
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.largeTextColor),
+                        ),
                       ),
                       Row(
                         children: [

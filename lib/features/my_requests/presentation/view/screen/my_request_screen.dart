@@ -9,6 +9,7 @@ import 'package:uni_help/features/my_requests/presentation/view/widget/my_reques
 import 'package:uni_help/features/my_requests/presentation/view_model/my_request_cubit.dart';
 import 'package:uni_help/features/my_requests/presentation/view_model/my_request_state_cubit.dart';
 import 'package:uni_help/features/rating/presentation/view/screens/rating_screen.dart';
+import 'package:uni_help/features/request_detail_screen/request_details_screen.dart';
 
 class MyRequestsScreen extends StatelessWidget {
   const MyRequestsScreen({super.key});
@@ -67,6 +68,20 @@ class _MyRequestsView extends StatelessWidget {
     );
   }
 
+  void _openRequest(BuildContext context, RequestEntity request) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RequestDetailsScreen(
+          request: request,
+          onMarkDone: request.status == RequestStatus.inProgress
+              ? () => _handleMarkDone(context, request)
+              : null,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -91,6 +106,7 @@ class _MyRequestsView extends StatelessWidget {
               request: requests[i],
               onDelete: () => _confirmDelete(context, requests[i]),
               onMarkDone: () => _handleMarkDone(context, requests[i]),
+              onTap: () => _openRequest(context, requests[i]),
             ),
           );
         },

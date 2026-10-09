@@ -9,6 +9,7 @@ import 'package:uni_help/features/explore_screen/presentation/view_model/explore
 import 'package:uni_help/features/explore_screen/presentation/view_model/explore_state.dart';
 import 'package:uni_help/features/home_screen/presentation/view/screens/request_card.dart';
 import 'package:uni_help/features/request_detail_screen/request_details_screen.dart';
+import 'package:uni_help/features/profile_screen/presentation/view/screens/user_profile_screen.dart';
 
 class ExploreScreen extends StatelessWidget {
   const ExploreScreen({super.key});
@@ -171,10 +172,24 @@ class _ExploreViewState extends State<_ExploreView> {
                                   itemCount: loaded.results.length,
                                   itemBuilder: (context, index) {
                                     final r = loaded.results[index];
-                                    return RequestCard(request: r,  onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => RequestDetailsScreen(request: r)),
-                        ),);
+                                    return RequestCard(
+                                      request: r,
+                                      onRequesterTap: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => UserProfileScreen(
+                                            uid: r.requesterId,
+                                          ),
+                                        ),
+                                      ),
+                                      onTap: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) =>
+                                              RequestDetailsScreen(request: r),
+                                        ),
+                                      ),
+                                    );
                                   },
                                 ),
                         ),

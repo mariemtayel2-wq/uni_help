@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:uni_help/core/di/service_locator.dart';
 import 'package:uni_help/core/entities/profile_entity.dart';
+import 'package:uni_help/core/entities/request_entity.dart';
+import 'package:uni_help/core/repositories/request_repo.dart';
 import 'package:uni_help/core/theme/app_colors.dart';
 import 'package:uni_help/features/profile_screen/domain/use_case/get_profile_by_id_use_case.dart';
 import 'package:uni_help/features/profile_screen/presentation/view/widgets/profile_header.dart';
-import 'package:uni_help/features/rating/presentation/view/screens/rating_screen.dart';
 
 class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({super.key, required this.uid});
@@ -16,12 +17,13 @@ class UserProfileScreen extends StatefulWidget {
 }
 
 class _UserProfileScreenState extends State<UserProfileScreen> {
-  late Future<ProfileEntity> _futureProfile;
+  late Future<List<RequestEntity>> _futureRequests;
 
   @override
   void initState() {
     super.initState();
-    _futureProfile = serviceLocator<GetProfileByIdUseCase>()(widget.uid);
+    _futureRequests =
+        serviceLocator<RequestsRepository>().getActiveRequestsByUserId(widget.uid);
   }
 
   @override
@@ -29,61 +31,76 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(title: const Text('Profile')),
-      body: FutureBuilder<ProfileEntity>(
-        future: _futureProfile,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+      body: StreamBuilder<ProfileEntity>(
+        stream: serviceLocator<GetProfileByIdUseCase>().watch(widget.uid),
+        builder: (context, profileSnapshot) {
+          if (profileSnapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (snapshot.hasError || !snapshot.hasData) {
+          if (profileSnapshot.hasError || !profileSnapshot.hasData) {
             return const Center(child: Text('Could not load this profile'));
           }
-          final profile = snapshot.data!;
+          final profile = profileSnapshot.data!;
 
-          return Padding(
-            padding: EdgeInsets.all(20.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ProfileHeader(profile: profile), // من غير onSettingsTap - مفيش أيقونة إعدادات هنا
-                SizedBox(height: 20.h),
-                if (profile.skills.isNotEmpty) ...[
-                  Text('Skills', style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold, color: AppColors.largeTextColor)),
+          return FutureBuilder<List<RequestEntity>>(
+            future: _futureRequests,
+            builder: (context, requestSnapshot) {
+              if (requestSnapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (requestSnapshot.hasError) {
+                return const Center(child: Text('Could not load this profile'));
+              }
+
+              final requests = requestSnapshot.data ?? const <RequestEntity>[];
+              return ListView(
+                padding: EdgeInsets.all(20.w),
+                children: [
+                  ProfileHeader(profile: profile),
+                  SizedBox(height: 20.h),
+                  Text('Skills',
+                      style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.largeTextColor)),
                   SizedBox(height: 8.h),
-                  Wrap(
-                    spacing: 8.w,
-                    runSpacing: 8.h,
-                    children: profile.skills
-                        .map((s) => Chip(
-                              label: Text(s),
-                              backgroundColor: AppColors.primaryColor.withOpacity(0.1),
-                            ))
-                        .toList(),
-                  ),
+                  if (profile.skills.isEmpty)
+                    Text('No skills added yet',
+                        style: TextStyle(color: AppColors.mediumTextColor))
+                  else
+                    Wrap(
+                      spacing: 8.w,
+                      runSpacing: 8.h,
+                      children: profile.skills
+                          .map((skill) => Chip(
+                                label: Text(skill),
+                                backgroundColor:
+                                    AppColors.primaryColor.withOpacity(0.1),
+                              ))
+                          .toList(),
+                    ),
                   SizedBox(height: 24.h),
-                ],
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => RateHelperScreen(
-                          targetUserId: profile.id,
-                          targetUserName: profile.fullName,
+                  Text('Active Requests',
+                      style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.largeTextColor)),
+                  SizedBox(height: 8.h),
+                  if (requests.isEmpty)
+                    Text('No active requests',
+                        style: TextStyle(color: AppColors.mediumTextColor))
+                  else
+                    ...requests.map(
+                      (request) => Card(
+                        child: ListTile(
+                          title: Text(request.title),
+                          subtitle: Text(request.category),
                         ),
                       ),
                     ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryColor,
-                      padding: EdgeInsets.symmetric(vertical: 14.h),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-                    ),
-                    child: const Text('Rate this user', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                  ),
-                ),
-              ],
-            ),
+                ],
+              );
+            },
           );
         },
       ),

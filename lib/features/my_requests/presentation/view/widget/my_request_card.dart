@@ -9,11 +9,13 @@ class MyRequestCard extends StatelessWidget {
     required this.request,
     required this.onDelete,
     required this.onMarkDone,
+    required this.onTap,
   });
 
   final RequestEntity request;
   final VoidCallback onDelete;
   final VoidCallback onMarkDone;
+  final VoidCallback onTap;
 
   Color _statusColor() {
     switch (request.status) {
@@ -43,11 +45,14 @@ class MyRequestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 12.h),
-      padding: EdgeInsets.all(14.w),
-      decoration: BoxDecoration(color: AppColors.white, borderRadius: BorderRadius.circular(14.r)),
-      child: Column(
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14.r),
+      child: Container(
+        margin: EdgeInsets.only(bottom: 12.h),
+        padding: EdgeInsets.all(14.w),
+        decoration: BoxDecoration(color: AppColors.white, borderRadius: BorderRadius.circular(14.r)),
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -71,8 +76,10 @@ class MyRequestCard extends StatelessWidget {
             children: [
               if (request.status == RequestStatus.inProgress)
                 Expanded(child: OutlinedButton(onPressed: onMarkDone, child: const Text('Mark as Done'))),
-              if (request.status == RequestStatus.inProgress) SizedBox(width: 8.w),
-              if (request.status == RequestStatus.pending)
+              if (request.status == RequestStatus.inProgress)
+                SizedBox(width: 8.w),
+              if (request.status == RequestStatus.pending ||
+                  request.status == RequestStatus.inProgress)
                 Expanded(
                   child: OutlinedButton(
                     onPressed: onDelete,
@@ -83,6 +90,7 @@ class MyRequestCard extends StatelessWidget {
             ],
           ),
         ],
+        ),
       ),
     );
   }

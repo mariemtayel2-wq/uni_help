@@ -47,45 +47,62 @@ class RequestModel {
   // ---------- القراءة ----------
 
   factory RequestModel.fromFirestore(DocumentSnapshot doc) {
-    return RequestModel.fromMap(doc.id, doc.data() as Map<String, dynamic>? ?? {});
+    return RequestModel.fromMap(
+      doc.id,
+      doc.data() as Map<String, dynamic>? ?? {},
+    );
   }
 
-  factory RequestModel.fromSnapshot(DocumentSnapshot doc) => RequestModel.fromFirestore(doc);
+  factory RequestModel.fromSnapshot(DocumentSnapshot doc) =>
+      RequestModel.fromFirestore(doc);
 
   factory RequestModel.fromMap(String id, Map<String, dynamic> data) {
     final createdAtValue = data['createdAt'];
     final createdAt = createdAtValue is Timestamp
         ? createdAtValue.toDate()
         : createdAtValue is DateTime
-            ? createdAtValue
-            : createdAtValue is String
-                ? DateTime.tryParse(createdAtValue) ?? DateTime.now()
-                : DateTime.now();
+        ? createdAtValue
+        : createdAtValue is String
+        ? DateTime.tryParse(createdAtValue) ?? DateTime.now()
+        : DateTime.now();
 
     final preferredTimeValue = data['preferredTime'];
     final preferredTime = preferredTimeValue is Timestamp
         ? preferredTimeValue.toDate()
         : preferredTimeValue is DateTime
-            ? preferredTimeValue
-            : preferredTimeValue is String
-                ? DateTime.tryParse(preferredTimeValue)
-                : null;
+        ? preferredTimeValue
+        : preferredTimeValue is String
+        ? DateTime.tryParse(preferredTimeValue)
+        : null;
 
     final ratingCountValue = data['requesterRatingCount'];
     final requesterRatingCount = ratingCountValue is num
         ? ratingCountValue.toInt()
         : int.tryParse(ratingCountValue?.toString() ?? '') ?? 0;
 
-    final attachmentsList = (data['attachments'] as List<dynamic>?)
+    final attachmentsList =
+        (data['attachments'] as List<dynamic>?)
             ?.map((a) => a.toString())
             .toList() ??
-        (data['attachmentUrl'] is String ? [data['attachmentUrl'] as String] : const <String>[]);
+        (data['attachmentUrl'] is String
+            ? [data['attachmentUrl'] as String]
+            : const <String>[]);
 
-    // ⬅️ جديد: لو الطلب قديم ومفيهوش status، نعتبره pending تلقائيًا
-    final statusValue = data['status'] as String?;
+    // Support legacy documents that used snake_case or omitted status after
+    // assigning a helper.
+    final rawStatus = data['status']?.toString();
+    final statusValue = rawStatus == 'in_progress' || rawStatus == 'In progress'
+        ? RequestStatus.inProgress.name
+        : rawStatus;
     final status = RequestStatus.values.firstWhere(
       (s) => s.name == statusValue,
-      orElse: () => RequestStatus.pending,
+      orElse: () =>
+          (data['helperId'] ?? data['applicantId']) is String &&
+              ((data['helperId'] ?? data['applicantId']) as String)
+                  .trim()
+                  .isNotEmpty
+          ? RequestStatus.inProgress
+          : RequestStatus.pending,
     );
 
     return RequestModel(
@@ -94,9 +111,12 @@ class RequestModel {
       description: data['description'] as String? ?? '',
       category: data['category'] as String? ?? 'General',
       skillNeeded: data['skillNeeded'] as String? ?? '',
-      tags: (data['tags'] as List<dynamic>? ?? []).map((t) => t.toString()).toList(),
+      tags: (data['tags'] as List<dynamic>? ?? [])
+          .map((t) => t.toString())
+          .toList(),
       createdAt: createdAt,
-      requesterId: data['requesterId'] as String? ?? data['userId'] as String? ?? '',
+      requesterId:
+          data['requesterId'] as String? ?? data['userId'] as String? ?? '',
       requesterName: data['requesterName'] as String? ?? 'Unknown',
       requesterInitials: data['requesterInitials'] as String? ?? '?',
       requesterRating: (data['requesterRating'] as num?)?.toDouble() ?? 0,
@@ -106,7 +126,7 @@ class RequestModel {
       location: data['location']?.toString(),
       availability: data['availability']?.toString(),
       status: status,
-      helperId: data['helperId'] as String?,
+      helperId: data['helperId'] as String? ?? data['applicantId'] as String?,
       helperName: data['helperName'] as String?,
     );
   }
@@ -127,7 +147,9 @@ class RequestModel {
       'requesterRating': requesterRating,
       'requesterRatingCount': requesterRatingCount,
       'attachments': attachments,
-      'preferredTime': preferredTime != null ? Timestamp.fromDate(preferredTime!) : null,
+      'preferredTime': preferredTime != null
+          ? Timestamp.fromDate(preferredTime!)
+          : null,
       'location': location,
       'availability': availability,
       'status': status.name,
@@ -142,26 +164,49 @@ class RequestModel {
 
   factory RequestModel.fromEntity(RequestEntity entity) {
     return RequestModel(
-      id: entity.id, title: entity.title, description: entity.description,
-      category: entity.category, skillNeeded: entity.skillNeeded, tags: entity.tags,
-      createdAt: entity.createdAt, requesterId: entity.requesterId,
-      requesterName: entity.requesterName, requesterInitials: entity.requesterInitials,
-      requesterRating: entity.requesterRating, requesterRatingCount: entity.requesterRatingCount,
-      attachments: entity.attachments, preferredTime: entity.preferredTime,
-      location: entity.location, availability: entity.availability,
-      status: entity.status, helperId: entity.helperId, helperName: entity.helperName,
+      id: entity.id,
+      title: entity.title,
+      description: entity.description,
+      category: entity.category,
+      skillNeeded: entity.skillNeeded,
+      tags: entity.tags,
+      createdAt: entity.createdAt,
+      requesterId: entity.requesterId,
+      requesterName: entity.requesterName,
+      requesterInitials: entity.requesterInitials,
+      requesterRating: entity.requesterRating,
+      requesterRatingCount: entity.requesterRatingCount,
+      attachments: entity.attachments,
+      preferredTime: entity.preferredTime,
+      location: entity.location,
+      availability: entity.availability,
+      status: entity.status,
+      helperId: entity.helperId,
+      helperName: entity.helperName,
     );
   }
 
   RequestEntity toEntity() {
     return RequestEntity(
-      id: id, title: title, description: description, category: category,
-      skillNeeded: skillNeeded, tags: tags, createdAt: createdAt,
-      requesterId: requesterId, requesterName: requesterName,
-      requesterInitials: requesterInitials, requesterRating: requesterRating,
-      requesterRatingCount: requesterRatingCount, attachments: attachments,
-      preferredTime: preferredTime, location: location, availability: availability,
-      status: status, helperId: helperId, helperName: helperName,
+      id: id,
+      title: title,
+      description: description,
+      category: category,
+      skillNeeded: skillNeeded,
+      tags: tags,
+      createdAt: createdAt,
+      requesterId: requesterId,
+      requesterName: requesterName,
+      requesterInitials: requesterInitials,
+      requesterRating: requesterRating,
+      requesterRatingCount: requesterRatingCount,
+      attachments: attachments,
+      preferredTime: preferredTime,
+      location: location,
+      availability: availability,
+      status: status,
+      helperId: helperId,
+      helperName: helperName,
     );
   }
 
@@ -175,15 +220,22 @@ class RequestModel {
     String? helperName,
   }) {
     return RequestModel(
-      id: id, title: title, description: description, category: category,
-      skillNeeded: skillNeeded, tags: tags, createdAt: createdAt,
+      id: id,
+      title: title,
+      description: description,
+      category: category,
+      skillNeeded: skillNeeded,
+      tags: tags,
+      createdAt: createdAt,
       requesterId: requesterId,
       requesterName: requesterName ?? this.requesterName,
       requesterInitials: requesterInitials ?? this.requesterInitials,
       requesterRating: requesterRating ?? this.requesterRating,
       requesterRatingCount: requesterRatingCount ?? this.requesterRatingCount,
-      attachments: attachments, preferredTime: preferredTime,
-      location: location, availability: availability,
+      attachments: attachments,
+      preferredTime: preferredTime,
+      location: location,
+      availability: availability,
       status: status ?? this.status,
       helperId: helperId ?? this.helperId,
       helperName: helperName ?? this.helperName,

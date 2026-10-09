@@ -46,12 +46,8 @@ class CreateRequestCubit extends Cubit<CreateRequestStateCubit> {
         requesterRatingCount: currentUser.ratingCount,
       );
 
-      await createRequestUseCase(requestEntity, attachment);
-
-      try {
-        await notifyHelpersUseCase(requestEntity);
-      } catch (_) {
-      }
+      final requestId = await createRequestUseCase(requestEntity, attachment);
+      await notifyHelpersUseCase(requestEntity.copyWith(id: requestId));
 
       emit(CreateRequestStateSuccess());
     } catch (e) {

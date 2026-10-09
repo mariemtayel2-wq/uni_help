@@ -25,7 +25,9 @@ class ProfileModel {
       fullName: data['fullName'] as String? ?? '',
       avatarUrl: data['avatarUrl'] as String?,
       rating: (data['rating'] as num?)?.toDouble() ?? 0,
-      reviewsCount: (data['reviewsCount'] as num?)?.toInt() ?? 0,
+      reviewsCount: ((data['ratingCount'] ?? data['reviewsCount']) as num?)
+              ?.toInt() ??
+          0,
       skills: (data['skills'] as List<dynamic>?)?.map((s) => s.toString()).toList() ?? [],
     );
   }

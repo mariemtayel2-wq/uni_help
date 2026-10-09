@@ -20,12 +20,25 @@ class SettingsTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = isDestructive ? Colors.red : AppColors.largeTextColor;
     return Material(
-      color: Colors.transparent,
+      color: AppColors.white,
       child: ListTile(
         onTap: onTap,
-        leading: Icon(icon, color: isDestructive ? Colors.red : AppColors.mediumTextColor, size: 22.sp),
-        title: Text(title, style: TextStyle(fontSize: 14.sp, color: color, fontWeight: FontWeight.w500)),
-        trailing: isDestructive ? null : Icon(Icons.chevron_right, color: AppColors.mediumTextColor),
+        leading: Icon(
+          icon,
+          color: isDestructive ? Colors.red : AppColors.mediumTextColor,
+          size: 22.sp,
+        ),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontSize: 14.sp,
+            color: color,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        trailing: isDestructive
+            ? null
+            : Icon(Icons.chevron_right, color: AppColors.mediumTextColor),
       ),
     );
   }

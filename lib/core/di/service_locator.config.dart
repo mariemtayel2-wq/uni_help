@@ -16,15 +16,15 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart'
     as _i163;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
-import 'package:uni_help/core/repositories/profile_repo.dart' as _i235;
-import 'package:uni_help/core/repositories/profile_repo_imp.dart' as _i507;
-import 'package:uni_help/core/repositories/rating_repo.dart' as _i1000;
-import 'package:uni_help/core/repositories/rating_repo_imp.dart' as _i126;
-import 'package:uni_help/core/repositories/request_repo.dart' as _i556;
-import 'package:uni_help/core/repositories/request_repo_imp.dart' as _i249;
-import 'package:uni_help/core/repositories/user_directory_repo.dart' as _i339;
+import 'package:uni_help/core/repositories/profile_repo.dart' as _i138;
+import 'package:uni_help/core/repositories/profile_repo_imp.dart' as _i670;
+import 'package:uni_help/core/repositories/rating_repo.dart' as _i207;
+import 'package:uni_help/core/repositories/rating_repo_imp.dart' as _i221;
+import 'package:uni_help/core/repositories/request_repo.dart' as _i787;
+import 'package:uni_help/core/repositories/request_repo_imp.dart' as _i507;
+import 'package:uni_help/core/repositories/user_directory_repo.dart' as _i867;
 import 'package:uni_help/core/repositories/user_directory_repo_imp.dart'
-    as _i104;
+    as _i1067;
 import 'package:uni_help/core/services/cloudinary_service.dart' as _i506;
 import 'package:uni_help/core/services/local_notification.dart' as _i187;
 import 'package:uni_help/core/services/notification_permision.dart' as _i44;
@@ -38,7 +38,7 @@ import 'package:uni_help/features/authentication/data/repo/auth_remote_data_sour
 import 'package:uni_help/features/authentication/data/repo/auth_remote_repo_imp.dart'
     as _i551;
 import 'package:uni_help/features/authentication/domain/repo/auth_remote_data_source.dart'
-    as _i299;
+    as _i298;
 import 'package:uni_help/features/authentication/domain/repo/auth_remote_repo.dart'
     as _i782;
 import 'package:uni_help/features/authentication/domain/use_case/forget_pass_use_case.dart'
@@ -60,7 +60,7 @@ import 'package:uni_help/features/authentication/presentation/view_model/registe
 import 'package:uni_help/features/authentication/presentation/view_model/resend_verification_cubit.dart'
     as _i487;
 import 'package:uni_help/features/chat_screen/data/repo/chat_data_source_imp.dart'
-    as _i298;
+    as _i299;
 import 'package:uni_help/features/chat_screen/data/repo/chat_repo_imp.dart'
     as _i28;
 import 'package:uni_help/features/chat_screen/domain/repo/chat_data_source.dart'
@@ -110,7 +110,9 @@ import 'package:uni_help/features/home_screen/domain/use_case/get_current_user_u
 import 'package:uni_help/features/home_screen/domain/use_case/get_recent_request_use_case.dart'
     as _i66;
 import 'package:uni_help/features/home_screen/presentation/view_model/home_cubit.dart'
-    as _i221;
+    as _i222;
+import 'package:uni_help/features/my_requests/domain/use_case/assign_helper_use_case.dart'
+    as _i499;
 import 'package:uni_help/features/my_requests/domain/use_case/delete_request_use_case.dart'
     as _i310;
 import 'package:uni_help/features/my_requests/domain/use_case/mark_request_as_read_use_case.dart'
@@ -167,10 +169,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i101.SecureStorageHelper>(
       () => _i101.SecureStorageHelper(),
     );
-    gh.lazySingleton<_i543.ChatRemoteDataSource>(
-      () => _i298.ChatRemoteDataSourceImpl(),
-    );
-    gh.lazySingleton<_i299.AuthRemoteDataSource>(
+    gh.lazySingleton<_i298.AuthRemoteDataSource>(
       () => _i266.AuthRemoteDataSourceImpl(),
     );
     gh.lazySingleton<_i700.CreateRequestRemoteDataSource>(
@@ -182,47 +181,22 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i412.HomeRemoteDataSource>(
       () => _i685.HomeRemoteDataSourceImpl(),
     );
-    gh.lazySingleton<_i78.ChatRepository>(
-      () => _i28.ChatRepositoryImpl(gh<_i543.ChatRemoteDataSource>()),
-    );
     gh.factory<_i409.CreateRequestRepository>(
       () => _i1039.CreateRequestRepositoryImpl(
         remoteDataSource: gh<_i700.CreateRequestRemoteDataSource>(),
       ),
     );
-    gh.lazySingleton<_i235.ProfileRepository>(
-      () => _i507.ProfileRepositoryImpl(
+    gh.lazySingleton<_i787.RequestsRepository>(
+      () => _i507.RequestsRepositoryImpl(gh<_i974.FirebaseFirestore>()),
+    );
+    gh.lazySingleton<_i782.AuthRepository>(
+      () => _i551.AuthRepositoryImpl(gh<_i298.AuthRemoteDataSource>()),
+    );
+    gh.lazySingleton<_i138.ProfileRepository>(
+      () => _i670.ProfileRepositoryImpl(
         gh<_i974.FirebaseFirestore>(),
         gh<_i59.FirebaseAuth>(),
       ),
-    );
-    gh.lazySingleton<_i29.GetOrCreateChatUseCase>(
-      () => _i29.GetOrCreateChatUseCase(gh<_i78.ChatRepository>()),
-    );
-    gh.lazySingleton<_i860.GetUserNameUseCase>(
-      () => _i860.GetUserNameUseCase(gh<_i78.ChatRepository>()),
-    );
-    gh.lazySingleton<_i37.SendMessageUseCase>(
-      () => _i37.SendMessageUseCase(gh<_i78.ChatRepository>()),
-    );
-    gh.lazySingleton<_i675.WatchMessagesUseCase>(
-      () => _i675.WatchMessagesUseCase(gh<_i78.ChatRepository>()),
-    );
-    gh.lazySingleton<_i977.WatchMyChatsUseCase>(
-      () => _i977.WatchMyChatsUseCase(gh<_i78.ChatRepository>()),
-    );
-    gh.factory<_i527.ChatCubit>(
-      () => _i527.ChatCubit(
-        gh<_i29.GetOrCreateChatUseCase>(),
-        gh<_i675.WatchMessagesUseCase>(),
-        gh<_i37.SendMessageUseCase>(),
-      ),
-    );
-    gh.lazySingleton<_i1000.RatingRepository>(
-      () => _i126.RatingRepositoryImpl(gh<_i974.FirebaseFirestore>()),
-    );
-    gh.lazySingleton<_i782.AuthRepository>(
-      () => _i551.AuthRepositoryImpl(gh<_i299.AuthRemoteDataSource>()),
     );
     gh.lazySingleton<_i1026.ForgotPasswordUseCase>(
       () => _i1026.ForgotPasswordUseCase(gh<_i782.AuthRepository>()),
@@ -249,14 +223,26 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i163.FlutterLocalNotificationsPlugin>(),
       ),
     );
+    gh.lazySingleton<_i867.UsersDirectoryRepository>(
+      () => _i1067.UsersDirectoryRepositoryImpl(gh<_i974.FirebaseFirestore>()),
+    );
     gh.lazySingleton<_i563.HomeRepository>(
       () => _i780.HomeRepositoryImpl(gh<_i412.HomeRemoteDataSource>()),
     );
+    gh.lazySingleton<_i295.AddSkillUseCase>(
+      () => _i295.AddSkillUseCase(gh<_i138.ProfileRepository>()),
+    );
+    gh.lazySingleton<_i790.GetProfileByIdUseCase>(
+      () => _i790.GetProfileByIdUseCase(gh<_i138.ProfileRepository>()),
+    );
+    gh.lazySingleton<_i127.RemoveSkillUseCase>(
+      () => _i127.RemoveSkillUseCase(gh<_i138.ProfileRepository>()),
+    );
+    gh.lazySingleton<_i96.WatchProfileUseCase>(
+      () => _i96.WatchProfileUseCase(gh<_i138.ProfileRepository>()),
+    );
     gh.lazySingleton<_i183.CreateRequestUseCase>(
       () => _i183.CreateRequestUseCase(gh<_i409.CreateRequestRepository>()),
-    );
-    gh.lazySingleton<_i582.SubmitRatingUseCase>(
-      () => _i582.SubmitRatingUseCase(gh<_i1000.RatingRepository>()),
     );
     gh.lazySingleton<_i397.LogoutUseCase>(
       () => _i397.LogoutUseCase(gh<_i59.FirebaseAuth>()),
@@ -267,8 +253,8 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i378.GoogleSignInUseCase>(),
       ),
     );
-    gh.lazySingleton<_i556.RequestsRepository>(
-      () => _i249.RequestsRepositoryImpl(gh<_i974.FirebaseFirestore>()),
+    gh.lazySingleton<_i207.RatingRepository>(
+      () => _i221.RatingRepositoryImpl(gh<_i974.FirebaseFirestore>()),
     );
     gh.lazySingleton<_i44.NotificationPermissionService>(
       () => _i44.NotificationPermissionService(
@@ -277,35 +263,17 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i59.FirebaseAuth>(),
       ),
     );
-    gh.lazySingleton<_i339.UsersDirectoryRepository>(
-      () => _i104.UsersDirectoryRepositoryImpl(gh<_i974.FirebaseFirestore>()),
-    );
-    gh.factory<_i79.ChatsListCubit>(
-      () => _i79.ChatsListCubit(
-        gh<_i977.WatchMyChatsUseCase>(),
-        gh<_i860.GetUserNameUseCase>(),
-      ),
-    );
     gh.lazySingleton<_i310.DeleteRequestUseCase>(
-      () => _i310.DeleteRequestUseCase(gh<_i556.RequestsRepository>()),
+      () => _i310.DeleteRequestUseCase(gh<_i787.RequestsRepository>()),
     );
     gh.lazySingleton<_i690.MarkRequestCompletedUseCase>(
-      () => _i690.MarkRequestCompletedUseCase(gh<_i556.RequestsRepository>()),
+      () => _i690.MarkRequestCompletedUseCase(gh<_i787.RequestsRepository>()),
     );
     gh.lazySingleton<_i876.WatchMyRequestsUseCase>(
-      () => _i876.WatchMyRequestsUseCase(gh<_i556.RequestsRepository>()),
+      () => _i876.WatchMyRequestsUseCase(gh<_i787.RequestsRepository>()),
     );
-    gh.lazySingleton<_i295.AddSkillUseCase>(
-      () => _i295.AddSkillUseCase(gh<_i235.ProfileRepository>()),
-    );
-    gh.lazySingleton<_i790.GetProfileByIdUseCase>(
-      () => _i790.GetProfileByIdUseCase(gh<_i235.ProfileRepository>()),
-    );
-    gh.lazySingleton<_i127.RemoveSkillUseCase>(
-      () => _i127.RemoveSkillUseCase(gh<_i235.ProfileRepository>()),
-    );
-    gh.lazySingleton<_i96.WatchProfileUseCase>(
-      () => _i96.WatchProfileUseCase(gh<_i235.ProfileRepository>()),
+    gh.lazySingleton<_i499.AssignHelperUseCase>(
+      () => _i499.AssignHelperUseCase(gh<_i787.RequestsRepository>()),
     );
     gh.factory<_i50.RegisterCubit>(
       () => _i50.RegisterCubit(gh<_i470.RegisterUseCase>()),
@@ -337,6 +305,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i718.ForgotPasswordCubit>(
       () => _i718.ForgotPasswordCubit(gh<_i1026.ForgotPasswordUseCase>()),
     );
+    gh.lazySingleton<_i582.SubmitRatingUseCase>(
+      () => _i582.SubmitRatingUseCase(gh<_i207.RatingRepository>()),
+    );
     gh.factory<_i730.MyRequestsCubit>(
       () => _i730.MyRequestsCubit(
         gh<_i876.WatchMyRequestsUseCase>(),
@@ -350,8 +321,8 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i749.GetCurrentUserUseCase>(),
       ),
     );
-    gh.factory<_i221.HomeCubit>(
-      () => _i221.HomeCubit(
+    gh.factory<_i222.HomeCubit>(
+      () => _i222.HomeCubit(
         gh<_i749.GetCurrentUserUseCase>(),
         gh<_i66.GetRecentRequestsUseCase>(),
       ),
@@ -376,6 +347,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i928.ExploreCubit>(
       () => _i928.ExploreCubit(gh<_i66.GetRecentRequestsUseCase>()),
     );
+    gh.lazySingleton<_i543.ChatRemoteDataSource>(
+      () => _i299.ChatRemoteDataSourceImpl(gh<_i142.SendNotificationUseCase>()),
+    );
     gh.factory<_i398.NotificationsCubit>(
       () => _i398.NotificationsCubit(
         watchNotificationsUseCase: gh<_i1034.WatchNotificationsUseCase>(),
@@ -387,15 +361,46 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i489.NotifyHelpersAboutNewRequestUseCase>(
       () => _i489.NotifyHelpersAboutNewRequestUseCase(
-        gh<_i339.UsersDirectoryRepository>(),
+        gh<_i867.UsersDirectoryRepository>(),
         gh<_i142.SendNotificationUseCase>(),
       ),
+    );
+    gh.lazySingleton<_i78.ChatRepository>(
+      () => _i28.ChatRepositoryImpl(gh<_i543.ChatRemoteDataSource>()),
+    );
+    gh.lazySingleton<_i29.GetOrCreateChatUseCase>(
+      () => _i29.GetOrCreateChatUseCase(gh<_i78.ChatRepository>()),
+    );
+    gh.lazySingleton<_i860.GetUserNameUseCase>(
+      () => _i860.GetUserNameUseCase(gh<_i78.ChatRepository>()),
+    );
+    gh.lazySingleton<_i37.SendMessageUseCase>(
+      () => _i37.SendMessageUseCase(gh<_i78.ChatRepository>()),
+    );
+    gh.lazySingleton<_i675.WatchMessagesUseCase>(
+      () => _i675.WatchMessagesUseCase(gh<_i78.ChatRepository>()),
+    );
+    gh.lazySingleton<_i977.WatchMyChatsUseCase>(
+      () => _i977.WatchMyChatsUseCase(gh<_i78.ChatRepository>()),
     );
     gh.factory<_i720.CreateRequestCubit>(
       () => _i720.CreateRequestCubit(
         createRequestUseCase: gh<_i183.CreateRequestUseCase>(),
         getCurrentUserUseCase: gh<_i749.GetCurrentUserUseCase>(),
         notifyHelpersUseCase: gh<_i489.NotifyHelpersAboutNewRequestUseCase>(),
+      ),
+    );
+    gh.factory<_i527.ChatCubit>(
+      () => _i527.ChatCubit(
+        gh<_i29.GetOrCreateChatUseCase>(),
+        gh<_i675.WatchMessagesUseCase>(),
+        gh<_i37.SendMessageUseCase>(),
+      ),
+    );
+    gh.factory<_i79.ChatsListCubit>(
+      () => _i79.ChatsListCubit(
+        gh<_i977.WatchMyChatsUseCase>(),
+        gh<_i860.GetUserNameUseCase>(),
       ),
     );
     return this;

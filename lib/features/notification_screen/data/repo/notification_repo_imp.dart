@@ -34,6 +34,7 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
     String? senderAvatarUrl,
     String? chatId,
     RequestEntity? request,
+    String? notificationId,
   }) {
     final data = NotificationModel.toMap(
       type: type,
@@ -45,6 +46,10 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
       chatId: chatId,
       requestModel: request == null ? null : RequestModel.fromEntity(request),
     );
-    return _remote.sendNotification(targetUid, data);
+    return _remote.sendNotification(
+      targetUid,
+      data,
+      notificationId: notificationId,
+    );
   }
 }

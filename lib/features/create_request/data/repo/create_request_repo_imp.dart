@@ -10,28 +10,16 @@ import 'package:uni_help/features/create_request/domain/repo/request_repo.dart';
 class CreateRequestRepositoryImpl implements CreateRequestRepository {
   final CreateRequestRemoteDataSource remoteDataSource;
 
-  CreateRequestRepositoryImpl({
-    required this.remoteDataSource,
-  });
+  CreateRequestRepositoryImpl({required this.remoteDataSource});
 
   @override
-  Future<void> createRequest(
-    RequestEntity request,
-    File? attachment,
-  ) async {
+  Future<String> createRequest(RequestEntity request, File? attachment) async {
     try {
-      final requestModel = RequestModel.fromEntity(
-        request,
-      );
+      final requestModel = RequestModel.fromEntity(request);
 
-      await remoteDataSource.createRequest(
-        requestModel,
-        attachment,
-      );
+      return await remoteDataSource.createRequest(requestModel, attachment);
     } catch (e) {
       throw Exception('Failed to create request: $e');
     }
   }
-
-
 }

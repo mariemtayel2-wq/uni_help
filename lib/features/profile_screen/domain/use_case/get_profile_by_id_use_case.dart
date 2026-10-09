@@ -7,4 +7,5 @@ class GetProfileByIdUseCase {
   const GetProfileByIdUseCase(this._repo);
   final ProfileRepository _repo;
   Future<ProfileEntity> call(String uid) => _repo.getProfileById(uid);
+  Stream<ProfileEntity> watch(String uid) => _repo.watchProfileById(uid);
 }

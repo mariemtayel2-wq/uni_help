@@ -19,23 +19,32 @@ class NotificationsScreen extends StatelessWidget {
     await context.read<NotificationsCubit>().onNotificationTapped(uid, n);
     if (!context.mounted) return;
 
-  if (n.chatId != null) {
-  final chatId = n.chatId!;
-  final sep = chatId.lastIndexOf('_');
-  final requestId = chatId.substring(0, sep);
-  final applicantId = chatId.substring(sep + 1);
+    if (n.chatId != null) {
+      final chatId = n.chatId!;
+      final sep = chatId.lastIndexOf('_');
+      final requestId = chatId.substring(0, sep);
+      final applicantId = chatId.substring(sep + 1);
+      final requesterId = applicantId == uid ? n.senderId : uid;
 
-  Navigator.push(context, MaterialPageRoute(builder: (_) => ChatScreen(
-    requestId: requestId,
-    applicantId: applicantId,
-    otherUserId: n.senderId,
-    otherUserName: n.senderName,
-    otherUserInitials: n.senderInitials,
-  )));
-} else if (n.request != null) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => RequestDetailsScreen(request: n.request!)),
+        MaterialPageRoute(
+          builder: (_) => ChatScreen(
+            requestId: requestId,
+            requesterId: requesterId,
+            applicantId: applicantId,
+            otherUserId: n.senderId,
+            otherUserName: n.senderName,
+            otherUserInitials: n.senderInitials,
+          ),
+        ),
+      );
+    } else if (n.request != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => RequestDetailsScreen(request: n.request!),
+        ),
       );
     }
   }
@@ -50,14 +59,19 @@ class NotificationsScreen extends StatelessWidget {
         title: const Text('Notifications'),
         actions: [
           TextButton(
-            onPressed: () => context.read<NotificationsCubit>().markAllAsRead(uid),
-            child: Text('Mark all as read', style: TextStyle(fontSize: 12.sp, color: AppColors.primaryColor)),
+            onPressed: () =>
+                context.read<NotificationsCubit>().markAllAsRead(uid),
+            child: Text(
+              'Mark all as read',
+              style: TextStyle(fontSize: 12.sp, color: AppColors.primaryColor),
+            ),
           ),
         ],
       ),
       body: BlocBuilder<NotificationsCubit, NotificationsStateCubit>(
         builder: (context, state) {
-          if (state is NotificationsStateLoading || state is NotificationsStateInitial) {
+          if (state is NotificationsStateLoading ||
+              state is NotificationsStateInitial) {
             return NotificationShimmer();
           }
           if (state is NotificationsStateError) {
@@ -66,7 +80,10 @@ class NotificationsScreen extends StatelessWidget {
           final list = (state as NotificationsStateLoaded).notifications;
           if (list.isEmpty) {
             return Center(
-              child: Text('No notifications yet', style: TextStyle(color: AppColors.mediumTextColor)),
+              child: Text(
+                'No notifications yet',
+                style: TextStyle(color: AppColors.mediumTextColor),
+              ),
             );
           }
           return ListView.separated(
